@@ -60,6 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="common\PointUtils.cs" />
+    <Compile Include="common\sift.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>

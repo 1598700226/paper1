@@ -125,6 +125,7 @@ namespace sift
         {
             isSelectRoi = true;
             roiVertex.Clear();
+            //
         }
     }
 }

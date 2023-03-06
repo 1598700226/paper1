@@ -40,6 +40,7 @@ namespace sift.common
             Mat scharrImg1_x = new Mat();
             CvInvoke.Scharr(srcImg1, scharrImg1_x, Emgu.CV.CvEnum.DepthType.Cv8U, 1, 0);
             CvInvoke.Imshow("sift_feature1", scharrImg1_x);
+            int a = 0;
         }
     }
 }
