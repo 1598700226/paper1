@@ -23,6 +23,7 @@ namespace sift
         public Boolean isSelectRoi = false;
         public List<Point> roiVertex = new List<Point>();
         /** pic**/
+        string[] picturePath;
         public float picScalaFactor = 1;
 
         public MainForm()
@@ -36,7 +37,7 @@ namespace sift
             {
                 Size = firstPicBox.Size,
                 Location = new Point(0,0),
-                BackColor = Color.Red,
+                BackColor = Color.Transparent,
                 Visible = true,
                 Name = "graphicsPicBox",
                 Parent = firstPicBox
@@ -105,7 +106,7 @@ namespace sift
             ofd.Multiselect = true;  //是否允许多选
             ofd.Filter = "所有文件|*.*"; //支持的文件格式
             ofd.ShowDialog();  //打开选择窗口
-            string[] picturePath = ofd.FileNames;  //将选择的图片的路径存储到picturePath
+            picturePath = ofd.FileNames;  //将选择的图片的路径存储到picturePath
             if (picturePath.Length != 2) {
                 MessageBox.Show("必须选择2副图片！");
                 return;
@@ -126,6 +127,30 @@ namespace sift
             isSelectRoi = true;
             roiVertex.Clear();
             //
+        }
+
+        private void siftBtn_Click(object sender, EventArgs e)
+        {
+            Sift.siftEmgu(picturePath[0], picturePath[1], null);
+        }
+
+        private void sparkBtn_Click(object sender, EventArgs e)
+        {
+            SparkUtils sparkUtils = new SparkUtils(firstPicBox);
+            sparkUtils.createSimulateSparks();
+        }
+
+        private void saveLeftPicBtn_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog dialog = new SaveFileDialog();
+
+            dialog.FileName = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds() + "图片"; //设置默认文件名
+            dialog.Filter = "图片(*.bmp)|*.bmp";
+            dialog.DefaultExt = "bmp";                                 //设置默认格式（可以不设）
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                firstPicBox.Image.Save(dialog.FileName);
+            }
         }
     }
 }
