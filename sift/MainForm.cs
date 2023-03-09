@@ -13,6 +13,7 @@ using System.Windows.Forms;
 using Emgu.CV.Features2D;
 using Emgu.CV.Util;
 using sift.common;
+using sift.Lucas_Kanade;
 
 namespace sift
 {
@@ -144,13 +145,31 @@ namespace sift
         {
             SaveFileDialog dialog = new SaveFileDialog();
 
-            dialog.FileName = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds() + "图片"; //设置默认文件名
+            dialog.FileName = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() + "图片"; //设置默认文件名
             dialog.Filter = "图片(*.bmp)|*.bmp";
             dialog.DefaultExt = "bmp";                                 //设置默认格式（可以不设）
             if (dialog.ShowDialog() == DialogResult.OK)
             {
                 firstPicBox.Image.Save(dialog.FileName);
             }
+        }
+
+        private void lKFAToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Image<Gray, byte> imageRef = new Image<Gray, byte>(picturePath[0]);
+            Rectangle rectTemp = new Rectangle(30, 60, 100, 100);
+            Image<Gray, byte> imageRefTemp = new Image<Gray, byte>(rectTemp.Size);
+            imageRefTemp = imageRef.Copy(rectTemp);
+
+            Bitmap graphicBitmap = new Bitmap(graphicsPicBox.Width, graphicsPicBox.Height);
+            Graphics g = Graphics.FromImage(graphicBitmap);
+            Rectangle rectDraw = new Rectangle((int)(rectTemp.Left * picScalaFactor), (int)(rectTemp.Top * picScalaFactor), (int)(rectTemp.Width * picScalaFactor), (int)(rectTemp.Height * picScalaFactor));
+            g.DrawRectangle(new Pen(Color.Green, 3), rectDraw);
+            graphicsPicBox.Image = graphicBitmap; 
+
+            Image<Gray, byte> imageDef = new Image<Gray, byte>(picturePath[1]);
+            double[] p = new double[]{0.01, 0.01, 0.0, 0.0, 30.0,60.0};
+            ForwardAdditive.method(imageRefTemp, imageDef, p, rectTemp.Width, rectTemp.Height);
         }
     }
 }

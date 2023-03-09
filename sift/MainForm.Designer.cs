@@ -30,15 +30,16 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
-            this.firstPicOpenBtn = new System.Windows.Forms.Button();
-            this.firstPicBox = new System.Windows.Forms.PictureBox();
-            this.secondPicBox = new System.Windows.Forms.PictureBox();
-            this.alBtn = new System.Windows.Forms.ToolStripDropDownButton();
-            this.siftBtn = new System.Windows.Forms.ToolStripMenuItem();
-            this.sparkBtn = new System.Windows.Forms.ToolStripMenuItem();
             this.operateBtn = new System.Windows.Forms.ToolStripDropDownButton();
             this.roiSelect = new System.Windows.Forms.ToolStripMenuItem();
             this.saveLeftPicBtn = new System.Windows.Forms.ToolStripMenuItem();
+            this.alBtn = new System.Windows.Forms.ToolStripDropDownButton();
+            this.siftBtn = new System.Windows.Forms.ToolStripMenuItem();
+            this.sparkBtn = new System.Windows.Forms.ToolStripMenuItem();
+            this.firstPicOpenBtn = new System.Windows.Forms.Button();
+            this.firstPicBox = new System.Windows.Forms.PictureBox();
+            this.secondPicBox = new System.Windows.Forms.PictureBox();
+            this.lKFAToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.firstPicBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.secondPicBox)).BeginInit();
@@ -55,6 +56,59 @@
             this.toolStrip1.Size = new System.Drawing.Size(1034, 33);
             this.toolStrip1.TabIndex = 0;
             this.toolStrip1.Text = "toolStrip1";
+            // 
+            // operateBtn
+            // 
+            this.operateBtn.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.operateBtn.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.roiSelect,
+            this.saveLeftPicBtn});
+            this.operateBtn.Image = ((System.Drawing.Image)(resources.GetObject("operateBtn.Image")));
+            this.operateBtn.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.operateBtn.Name = "operateBtn";
+            this.operateBtn.Size = new System.Drawing.Size(64, 28);
+            this.operateBtn.Text = "操作";
+            // 
+            // roiSelect
+            // 
+            this.roiSelect.Name = "roiSelect";
+            this.roiSelect.Size = new System.Drawing.Size(270, 34);
+            this.roiSelect.Text = "ROI选择";
+            this.roiSelect.Click += new System.EventHandler(this.roiSelect_Click);
+            // 
+            // saveLeftPicBtn
+            // 
+            this.saveLeftPicBtn.Name = "saveLeftPicBtn";
+            this.saveLeftPicBtn.Size = new System.Drawing.Size(270, 34);
+            this.saveLeftPicBtn.Text = "保存左图";
+            this.saveLeftPicBtn.Click += new System.EventHandler(this.saveLeftPicBtn_Click);
+            // 
+            // alBtn
+            // 
+            this.alBtn.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.alBtn.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.siftBtn,
+            this.sparkBtn,
+            this.lKFAToolStripMenuItem});
+            this.alBtn.Image = ((System.Drawing.Image)(resources.GetObject("alBtn.Image")));
+            this.alBtn.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.alBtn.Name = "alBtn";
+            this.alBtn.Size = new System.Drawing.Size(100, 28);
+            this.alBtn.Text = "算法测试";
+            // 
+            // siftBtn
+            // 
+            this.siftBtn.Name = "siftBtn";
+            this.siftBtn.Size = new System.Drawing.Size(270, 34);
+            this.siftBtn.Text = "sift";
+            this.siftBtn.Click += new System.EventHandler(this.siftBtn_Click);
+            // 
+            // sparkBtn
+            // 
+            this.sparkBtn.Name = "sparkBtn";
+            this.sparkBtn.Size = new System.Drawing.Size(270, 34);
+            this.sparkBtn.Text = "模拟散斑生成";
+            this.sparkBtn.Click += new System.EventHandler(this.sparkBtn_Click);
             // 
             // firstPicOpenBtn
             // 
@@ -84,57 +138,12 @@
             this.secondPicBox.TabIndex = 4;
             this.secondPicBox.TabStop = false;
             // 
-            // alBtn
+            // lKFAToolStripMenuItem
             // 
-            this.alBtn.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.alBtn.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.siftBtn,
-            this.sparkBtn});
-            this.alBtn.Image = ((System.Drawing.Image)(resources.GetObject("alBtn.Image")));
-            this.alBtn.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.alBtn.Name = "alBtn";
-            this.alBtn.Size = new System.Drawing.Size(64, 28);
-            this.alBtn.Text = "算法";
-            // 
-            // siftBtn
-            // 
-            this.siftBtn.Name = "siftBtn";
-            this.siftBtn.Size = new System.Drawing.Size(270, 34);
-            this.siftBtn.Text = "sift";
-            this.siftBtn.Click += new System.EventHandler(this.siftBtn_Click);
-            // 
-            // sparkBtn
-            // 
-            this.sparkBtn.Name = "sparkBtn";
-            this.sparkBtn.Size = new System.Drawing.Size(270, 34);
-            this.sparkBtn.Text = "模拟散斑生成";
-            this.sparkBtn.Click += new System.EventHandler(this.sparkBtn_Click);
-            // 
-            // operateBtn
-            // 
-            this.operateBtn.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.operateBtn.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.roiSelect,
-            this.saveLeftPicBtn});
-            this.operateBtn.Image = ((System.Drawing.Image)(resources.GetObject("operateBtn.Image")));
-            this.operateBtn.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.operateBtn.Name = "operateBtn";
-            this.operateBtn.Size = new System.Drawing.Size(64, 28);
-            this.operateBtn.Text = "操作";
-            // 
-            // roiSelect
-            // 
-            this.roiSelect.Name = "roiSelect";
-            this.roiSelect.Size = new System.Drawing.Size(270, 34);
-            this.roiSelect.Text = "ROI选择";
-            this.roiSelect.Click += new System.EventHandler(this.roiSelect_Click);
-            // 
-            // saveLeftPicBtn
-            // 
-            this.saveLeftPicBtn.Name = "saveLeftPicBtn";
-            this.saveLeftPicBtn.Size = new System.Drawing.Size(270, 34);
-            this.saveLeftPicBtn.Text = "保存左图";
-            this.saveLeftPicBtn.Click += new System.EventHandler(this.saveLeftPicBtn_Click);
+            this.lKFAToolStripMenuItem.Name = "lKFAToolStripMenuItem";
+            this.lKFAToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
+            this.lKFAToolStripMenuItem.Text = "LK-FA";
+            this.lKFAToolStripMenuItem.Click += new System.EventHandler(this.lKFAToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -171,6 +180,7 @@
         private System.Windows.Forms.ToolStripDropDownButton operateBtn;
         private System.Windows.Forms.ToolStripMenuItem roiSelect;
         private System.Windows.Forms.ToolStripMenuItem saveLeftPicBtn;
+        private System.Windows.Forms.ToolStripMenuItem lKFAToolStripMenuItem;
     }
 }
 

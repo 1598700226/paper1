@@ -59,9 +59,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="common\Algorithm.cs" />
     <Compile Include="common\PointUtils.cs" />
     <Compile Include="common\Sift.cs" />
     <Compile Include="common\SparkUtils.cs" />
+    <Compile Include="Lucas Kanade\BackwardAdditive.cs" />
+    <Compile Include="Lucas Kanade\BackwardCompositional.cs" />
+    <Compile Include="Lucas Kanade\ForwardAdditive.cs" />
+    <Compile Include="Lucas Kanade\ForwardCompositional.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>

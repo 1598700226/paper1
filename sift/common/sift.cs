@@ -16,13 +16,13 @@ namespace sift.common
         public static void siftEmgu(String firstPicPath, String secondPicPath, List<PointF> polygonPoints)
         {
             Image<Gray, Byte> originPic = new Image<Gray, byte>(firstPicPath);
-
+            Image<Gray, Byte> deformPic = new Image<Gray, byte>(secondPicPath); 
             SIFT sift = new SIFT(1000);
             //计算特征点
             Mat srcImg1 = CvInvoke.Imread(firstPicPath);
             Mat srcImg2 = CvInvoke.Imread(secondPicPath);
-            MKeyPoint[] keyPoints1 = sift.Detect(srcImg1);
-            MKeyPoint[] keyPoints2 = sift.Detect(srcImg2);
+            MKeyPoint[] keyPoints1 = sift.Detect(originPic);
+            MKeyPoint[] keyPoints2 = sift.Detect(deformPic);
             
             //绘制特征点
             Mat sift_feature1 = new Mat();
@@ -43,7 +43,7 @@ namespace sift.common
             Mat descriptors2 = new Mat();
             sift.Compute(srcImg1, vkeyPoint1, descriptors1);
             sift.Compute(srcImg2, vkeyPoint2, descriptors2);
-            //使用BF匹配器进行暴力匹配
+/*            //使用BF匹配器进行暴力匹配
             BFMatcher bFMatcher = new BFMatcher(DistanceType.L2);
             VectorOfVectorOfDMatch matches = new VectorOfVectorOfDMatch();
             //添加特征描述符
@@ -84,7 +84,7 @@ namespace sift.common
                 result, new MCvScalar(0, 255, 0), new MCvScalar(0, 0, 255), null);
             //显示匹配结果
             CvInvoke.NamedWindow("match-result", Emgu.CV.CvEnum.WindowFlags.Normal);
-            CvInvoke.Imshow("match-result", result);
+            CvInvoke.Imshow("match-result", result);*/
         }
     }
 }
