@@ -3,12 +3,15 @@ D:\csharp code\sift\sift\bin\Debug\sift.exe
 D:\csharp code\sift\sift\bin\Debug\sift.pdb
 D:\csharp code\sift\sift\bin\Debug\Emgu.CV.dll
 D:\csharp code\sift\sift\bin\Debug\Emgu.CV.Platform.NetFramework.dll
+D:\csharp code\sift\sift\bin\Debug\Microsoft.Kinect.dll
 D:\csharp code\sift\sift\bin\Debug\Emgu.CV.Bitmap.dll
 D:\csharp code\sift\sift\bin\Debug\Emgu.CV.xml
 D:\csharp code\sift\sift\bin\Debug\Emgu.CV.Platform.NetFramework.xml
+D:\csharp code\sift\sift\bin\Debug\Microsoft.Kinect.xml
 D:\csharp code\sift\sift\bin\Debug\Emgu.CV.Bitmap.xml
 D:\csharp code\sift\sift\obj\Debug\sift.csproj.AssemblyReference.cache
 D:\csharp code\sift\sift\obj\Debug\sift.csproj.SuggestedBindingRedirects.cache
+D:\csharp code\sift\sift\obj\Debug\sift.ImgShow.resources
 D:\csharp code\sift\sift\obj\Debug\sift.MainForm.resources
 D:\csharp code\sift\sift\obj\Debug\sift.Properties.Resources.resources
 D:\csharp code\sift\sift\obj\Debug\sift.csproj.GenerateResource.cache
@@ -16,3 +19,5 @@ D:\csharp code\sift\sift\obj\Debug\sift.csproj.CoreCompileInputs.cache
 D:\csharp code\sift\sift\obj\Debug\sift.csproj.CopyComplete
 D:\csharp code\sift\sift\obj\Debug\sift.exe
 D:\csharp code\sift\sift\obj\Debug\sift.pdb
+D:\csharp code\sift\sift\bin\Debug\MathNet.Numerics.dll
+D:\csharp code\sift\sift\bin\Debug\MathNet.Numerics.xml

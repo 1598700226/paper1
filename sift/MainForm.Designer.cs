@@ -36,10 +36,15 @@
             this.alBtn = new System.Windows.Forms.ToolStripDropDownButton();
             this.siftBtn = new System.Windows.Forms.ToolStripMenuItem();
             this.sparkBtn = new System.Windows.Forms.ToolStripMenuItem();
+            this.lKFAToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.kinectToolBtn = new System.Windows.Forms.ToolStripDropDownButton();
+            this.openKinectBtn = new System.Windows.Forms.ToolStripMenuItem();
+            this.保存ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.FusionBtn = new System.Windows.Forms.ToolStripMenuItem();
             this.firstPicOpenBtn = new System.Windows.Forms.Button();
             this.firstPicBox = new System.Windows.Forms.PictureBox();
             this.secondPicBox = new System.Windows.Forms.PictureBox();
-            this.lKFAToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.calculateCloudRT = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.firstPicBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.secondPicBox)).BeginInit();
@@ -50,7 +55,8 @@
             this.toolStrip1.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.operateBtn,
-            this.alBtn});
+            this.alBtn,
+            this.kinectToolBtn});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(1034, 33);
@@ -110,6 +116,45 @@
             this.sparkBtn.Text = "模拟散斑生成";
             this.sparkBtn.Click += new System.EventHandler(this.sparkBtn_Click);
             // 
+            // lKFAToolStripMenuItem
+            // 
+            this.lKFAToolStripMenuItem.Name = "lKFAToolStripMenuItem";
+            this.lKFAToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
+            this.lKFAToolStripMenuItem.Text = "LK-FA";
+            this.lKFAToolStripMenuItem.Click += new System.EventHandler(this.lKFAToolStripMenuItem_Click);
+            // 
+            // kinectToolBtn
+            // 
+            this.kinectToolBtn.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.openKinectBtn,
+            this.保存ToolStripMenuItem,
+            this.FusionBtn,
+            this.calculateCloudRT});
+            this.kinectToolBtn.Name = "kinectToolBtn";
+            this.kinectToolBtn.Size = new System.Drawing.Size(117, 28);
+            this.kinectToolBtn.Text = "Kinect测试";
+            // 
+            // openKinectBtn
+            // 
+            this.openKinectBtn.Name = "openKinectBtn";
+            this.openKinectBtn.Size = new System.Drawing.Size(270, 34);
+            this.openKinectBtn.Text = "打开";
+            this.openKinectBtn.Click += new System.EventHandler(this.openKinectBtn_Click);
+            // 
+            // 保存ToolStripMenuItem
+            // 
+            this.保存ToolStripMenuItem.Name = "保存ToolStripMenuItem";
+            this.保存ToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
+            this.保存ToolStripMenuItem.Text = "保存";
+            this.保存ToolStripMenuItem.Click += new System.EventHandler(this.保存ToolStripMenuItem_Click);
+            // 
+            // FusionBtn
+            // 
+            this.FusionBtn.Name = "FusionBtn";
+            this.FusionBtn.Size = new System.Drawing.Size(270, 34);
+            this.FusionBtn.Text = "融合";
+            this.FusionBtn.Click += new System.EventHandler(this.FusionBtn_Click);
+            // 
             // firstPicOpenBtn
             // 
             this.firstPicOpenBtn.Location = new System.Drawing.Point(12, 36);
@@ -138,12 +183,12 @@
             this.secondPicBox.TabIndex = 4;
             this.secondPicBox.TabStop = false;
             // 
-            // lKFAToolStripMenuItem
+            // calculateCloudRT
             // 
-            this.lKFAToolStripMenuItem.Name = "lKFAToolStripMenuItem";
-            this.lKFAToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
-            this.lKFAToolStripMenuItem.Text = "LK-FA";
-            this.lKFAToolStripMenuItem.Click += new System.EventHandler(this.lKFAToolStripMenuItem_Click);
+            this.calculateCloudRT.Name = "calculateCloudRT";
+            this.calculateCloudRT.Size = new System.Drawing.Size(270, 34);
+            this.calculateCloudRT.Text = "两幅点云计算RT";
+            this.calculateCloudRT.Click += new System.EventHandler(this.calculateCloudRT_Click);
             // 
             // MainForm
             // 
@@ -158,6 +203,7 @@
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "主窗口";
+            this.Load += new System.EventHandler(this.MainForm_Load);
             this.Shown += new System.EventHandler(this.MainForm_Shown);
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
@@ -181,6 +227,11 @@
         private System.Windows.Forms.ToolStripMenuItem roiSelect;
         private System.Windows.Forms.ToolStripMenuItem saveLeftPicBtn;
         private System.Windows.Forms.ToolStripMenuItem lKFAToolStripMenuItem;
+        private System.Windows.Forms.ToolStripDropDownButton kinectToolBtn;
+        private System.Windows.Forms.ToolStripMenuItem openKinectBtn;
+        private System.Windows.Forms.ToolStripMenuItem 保存ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem FusionBtn;
+        private System.Windows.Forms.ToolStripMenuItem calculateCloudRT;
     }
 }
 
