@@ -11,18 +11,34 @@ using System.Drawing.Drawing2D;
 
 namespace sift.Lucas_Kanade
 {
-    internal class ForwardAdditive
+
+
+    /**
+     * 前加性算法， 
+     */
+    public class ForwardAdditive
     {
+        /**
+         
+         wrap
+        [ 1+P1 P3 P5 ][X]
+        [ P2 1+P4 P6 ][Y]
+                      [1]
 
-        public static double[] method(Image<Gray, Byte> imgRef, Image<Gray, Byte> imgDef, double[] p, int tempWidth, int tempHeight) {
+        jacobian = 梯度I * wrap/A 
+        [Ix Iy] * [x 0 y 0 1 0] 
+                  [0 x 0 y 0 1]
 
-            Matrix<double> wrap = new Matrix<double>(6, 1);
-            wrap[0, 0] = p[0];
-            wrap[1, 0] = p[1];
-            wrap[2, 0] = p[2];
-            wrap[3, 0] = p[3];
-            wrap[4, 0] = p[4];
-            wrap[5, 0] = p[5];
+        */
+        public static double[] method(Image<Gray, Byte> imgRef, Image<Gray, Byte> imgDef, double[] p, int tempWidth, int tempHeight, int tx, int ty) {
+
+            Matrix<double> warp = new Matrix<double>(6, 1);
+            warp[0, 0] = p[0];
+            warp[1, 0] = p[1];
+            warp[2, 0] = p[2];
+            warp[3, 0] = p[3];
+            warp[4, 0] = p[4];
+            warp[5, 0] = p[5];
 
             Image<Gray, double> imgRefGradientx = new Image<Gray, double>(imgRef.Width, imgRef.Height);
             Image<Gray, double> imgRefGradienty = new Image<Gray, double>(imgRef.Width, imgRef.Height);
@@ -34,7 +50,11 @@ namespace sift.Lucas_Kanade
             CvInvoke.Sobel(imgDef, imgDefGradientx, Emgu.CV.CvEnum.DepthType.Cv64F, 1, 0, 1);
             CvInvoke.Sobel(imgDef, imgDefGradienty, Emgu.CV.CvEnum.DepthType.Cv64F, 0, 1, 1);
 
-            for(int i = 0; i < 1000; i++) {
+            Rectangle rectTemp = new Rectangle(tx, ty, tempWidth, tempHeight);
+            Image<Gray, byte> imageRefTemp = new Image<Gray, byte>(rectTemp.Size);
+            imageRefTemp = imgRef.Copy(rectTemp);
+
+            for(int i = 0; i < 50; i++) {
                 double cost = 0;
 
                 Matrix<double> residual = new Matrix<double>(6, 1);
@@ -43,16 +63,17 @@ namespace sift.Lucas_Kanade
                 {
                     for (int y = 0; y < tempHeight; y++)
                     {
-                        double wx = (1 + wrap[0, 0]) * (double)x + wrap[2, 0] * (double)y + wrap[4, 0];
-                        double wy = wrap[1, 0] * (double)x + (1 + wrap[3, 0]) * (double)y + wrap[5, 0];
+                        double wx = (1 + warp[0, 0]) * (double)x + warp[2, 0] * (double)y + warp[4, 0];
+                        double wy = warp[1, 0] * (double)x + (1 + warp[3, 0]) * (double)y + warp[5, 0];
 
                         double iw = Algorithm.bilinearInterpolation(imgDef, wx, wy);
-                        double err = iw - imgRef.Data[y, x, 0];
+                        double err = iw - imageRefTemp.Data[y, x, 0];
 
                         // 梯度x和y
                         double gx_warped = Algorithm.bilinearInterpolation(imgDefGradientx, wx, wy);
                         double gy_warped = Algorithm.bilinearInterpolation(imgDefGradienty, wx, wy);
 
+                        // 计算雅可比
                         Matrix<double> jacobian = new Matrix<double>(1, 6);
                         jacobian[0, 0] = x * gx_warped;
                         jacobian[0, 1] = x * gy_warped;
@@ -61,6 +82,7 @@ namespace sift.Lucas_Kanade
                         jacobian[0, 4] = gx_warped;
                         jacobian[0, 5] = gy_warped;
 
+                        // 计算黑森矩阵
                         hession += jacobian.Transpose() * jacobian;
                         residual -= jacobian.Transpose() * err;
 
@@ -71,7 +93,7 @@ namespace sift.Lucas_Kanade
                 Matrix<double> Ihession = new Matrix<double>(6, 6);
                 CvInvoke.Invert(hession, Ihession, 0);
                 Matrix<double> delta_p = Ihession * residual;
-                wrap += delta_p;
+                warp += delta_p;
 
                 if (delta_p[1, 0] * delta_p[1, 0] +
                     delta_p[2, 0] * delta_p[2, 0] +
@@ -83,7 +105,13 @@ namespace sift.Lucas_Kanade
                 }
             }
 
-            return null;
+            p[0] = warp[0, 0];
+            p[1] = warp[1, 0];
+            p[2] = warp[2, 0];
+            p[3] = warp[3, 0];
+            p[4] = warp[4, 0];
+            p[5] = warp[5, 0];
+            return p;
         }
     }
 }

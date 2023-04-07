@@ -18,6 +18,8 @@ namespace sift.kinect
 {
     public class CameraOpen
     {
+        public MainForm mainForm;
+
         /// <summary>
         /// Map depth range to byte range
         /// </summary>
@@ -60,7 +62,8 @@ namespace sift.kinect
             }
         }
 
-        public void Init(PictureBox picBoxColor, PictureBox picBoxDepth) {
+        public void Init(PictureBox picBoxColor, PictureBox picBoxDepth, MainForm mainForm) {
+            this.mainForm = mainForm;
             // get the kinectSensor object
             this.kinectSensor = KinectSensor.GetDefault();
 
@@ -156,6 +159,7 @@ namespace sift.kinect
 
                 Marshal.Copy(depthPixels, 0, ptrSrc, depthPixels.Length);
                 this.depthBitmap.UnlockBits(bitmapData);
+                pictureBoxDepth.Height = (int)((float)pictureBoxColor.Width / depthBitmap.Width * depthBitmap.Height);
                 pictureBoxDepth.Image = depthBitmap;
             }
         }
@@ -216,7 +220,10 @@ namespace sift.kinect
                         this.colorBitmap.UnlockBits(bitmapData);
                     }
                 }
+
+                pictureBoxColor.Height = (int)((float)pictureBoxColor.Width / colorBitmap.Width * colorBitmap.Height);
                 pictureBoxColor.Image = colorBitmap;
+                mainForm.picScalaFactor = (float)pictureBoxColor.Width / (float)colorBitmap.Width;
             }
         }
 

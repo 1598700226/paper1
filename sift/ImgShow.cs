@@ -4,7 +4,7 @@ using Emgu.CV.Structure;
 using Microsoft.Kinect;
 using sift.common;
 using sift.PFH;
-using sift.PointCloud;
+using sift.PointCloudHandler;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -16,6 +16,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace sift
 {
@@ -24,34 +25,38 @@ namespace sift
         // 创建这个ImageShow的Form
         private MainForm mainForm;
 
-        private Bitmap bitmap = null;
-        private ushort[] depths = null;
+        public Bitmap bitmap = null;
+        public ushort[] depths = null;
+        public byte[] depthsPixel;
         private CameraIntrinsics cameraIntrinsics;
         // 注意4个byte代表一个像素点rgba
-        private byte[] rgbaData = null;
+        public byte[] bgraData = null;
+        // 原始 未经过区域选点的
+        public byte[] oriBgraData = null;
 
         // 降采样后的点
         public List<PointCloud3D> filterPointCloud3d;
 
-        private int sampleRange = 20;
+        private int sampleRange = 5;
         private int fpfhRange = 50;
 
-        public ImgShow(Bitmap bitmap, ushort[] depths, CameraIntrinsics cameraIntrinsics, byte[] rgbaData, MainForm mainform)
+        public ImgShow(Bitmap bitmap, ushort[] depths, byte[] depthsPixel, 
+            CameraIntrinsics cameraIntrinsics, byte[] bgraData, byte[] oriBgraData, MainForm mainform)
         {
             InitializeComponent();
             this.bitmap = bitmap;
             this.depths = depths; 
+            this.depthsPixel = depthsPixel;
             this.cameraIntrinsics = cameraIntrinsics;
-            this.rgbaData = rgbaData;
+            this.bgraData = bgraData;
+            this.oriBgraData = oriBgraData;
             this.mainForm = mainform;
+           
         }
 
         private void ImgShow_Load(object sender, EventArgs e)
         {
-            Image<Gray, byte> image = BitmapExtensions.ToGrayImage(bitmap);
-            picBox.Image = BitmapExtensions.GrayToBitmap(image);
-            //picBox.Image = this.bitmap;
-
+            picBox.Image = this.bitmap;
             // 1.计算点云
             List<PointCloud3D> pointCloud3Ds = new List<PointCloud3D>();
             for (int i = 0; i < bitmap.Width; i++)
@@ -63,32 +68,33 @@ namespace sift
                     {
                         continue;
                     }
-                    int x_mm, y_mm;
-                    calculateWorldXY(cameraIntrinsics, i, j, z_mm, out x_mm, out y_mm);
-                    pointCloud3Ds.Add(new PointCloud3D(x_mm, y_mm, z_mm, i, j));
+                    double x_mm, y_mm;
+                    calculateWorldXY(i, j, z_mm, out x_mm, out y_mm);
+                    double z = getDepthByPicXY(i, j);
+                    pointCloud3Ds.Add(new PointCloud3D(x_mm, y_mm, z_mm, i, j, z));
                 }
             }
-
             filterPointCloud3d = pointCloud3Ds;
-            // 2.点云降采样
-            /*            KdTree kdTree = new KdTree(pointCloud3Ds);
-                        filterPointCloud3d = PointCloud3D.downSampling(picBox.Image.Width, picBox.Image.Height, sampleRange, pointCloud3Ds);
-                        PointFetures.FPFH(filterPointCloud3d, fpfhRange);*/
+        }
+
+        public double getDepthByPicXY(double x, double y) {
+            return Algorithm.bilinearInterpolation(depths, bitmap.Width, bitmap.Height, x, y);
+        }
+
+        public double getDepthPixelByPicXY(double x, double y)
+        {
+            return Algorithm.bilinearInterpolation(depthsPixel, bitmap.Width, bitmap.Height, x, y);
         }
 
         private void picBox_MouseMove(object sender, MouseEventArgs e)
         {
             int x = e.X;
             int y = e.Y;
-
             int pic_x = (int)((double)x / (double)picBox.Width * (double)bitmap.Width);
             int pic_y = (int)((double)y / (double)picBox.Height * (double)bitmap.Height);
-
             int z_mm = depths[(pic_x + pic_y * bitmap.Width)];
-            int x_mm, y_mm;
-
-            calculateWorldXY(cameraIntrinsics, pic_x, pic_y, z_mm, out x_mm, out y_mm);
-
+            double x_mm, y_mm;
+            calculateWorldXY(pic_x, pic_y, z_mm, out x_mm, out y_mm);
             infoLabel.Text = String.Format("x_mm:{0} y_mm:{1} z_mm:{2}; x:{3} y:{4}",
                 x_mm, y_mm, z_mm, x, y);
         }
@@ -104,14 +110,15 @@ namespace sift
                     if (z_mm <= 0) {
                         continue;
                     }
-                    int x_mm, y_mm;
-                    calculateWorldXY(cameraIntrinsics, i, j, z_mm, out x_mm, out y_mm);
-                    pointCloud3Ds.Add(new PointCloud3D(x_mm, y_mm, z_mm, i, j));
+                    double x_mm, y_mm;
+                    calculateWorldXY(i, j, z_mm, out x_mm, out y_mm);
+                    double z = getDepthByPicXY(i, j);
+                    pointCloud3Ds.Add(new PointCloud3D(x_mm, y_mm, z_mm, i, j, z));
                 }
             }
 
             // 2.点云降采样
-            List<PointCloud3D> filterPointClouds = PointCloud3D.downSampling(picBox.Image.Width, picBox.Image.Height, sampleRange, pointCloud3Ds);
+            List<PointCloud3D> filterPointClouds = PointCloud3D.downSamplingTisu(picBox.Image.Width, picBox.Image.Height, sampleRange, pointCloud3Ds);
 
             // 3.显示降采样后的点云
             showCloudPoint3D(filterPointClouds);
@@ -130,22 +137,28 @@ namespace sift
             }
         }
 
-        private void calculateWorldXY(CameraIntrinsics cameraIntrinsics,
-            int xp, int yp, double zw,
-            out int xw, out int yw) {
+        public void calculateWorldXY(double xp, double yp, double zw,
+            out double xw, out double yw) {
 
-            float ux = cameraIntrinsics.PrincipalPointX;
-            float uy = cameraIntrinsics.PrincipalPointY;
-            float fx = cameraIntrinsics.FocalLengthX;
-            float fy = cameraIntrinsics.FocalLengthY;
+            float ux = this.cameraIntrinsics.PrincipalPointX;
+            float uy = this.cameraIntrinsics.PrincipalPointY;
+            float fx = this.cameraIntrinsics.FocalLengthX;
+            float fy = this.cameraIntrinsics.FocalLengthY;
 
-            xw = (int)(zw * (xp - ux) / fx);
-            yw = (int)(zw * (yp - uy) / fy);
+            xw = (zw * (xp - ux) / fx);
+            yw = (zw * (yp - uy) / fy);
+        }
+
+        public Color GetColor(int pic_x, int pic_y) {
+            return Color.FromArgb(bgraData[(pic_x + pic_y * bitmap.Width) * 4 + 3], 
+                bgraData[(pic_x + pic_y * bitmap.Width) * 4 + 2], 
+                bgraData[(pic_x + pic_y * bitmap.Width) * 4 + 1], 
+                bgraData[(pic_x + pic_y * bitmap.Width) * 4]);
         }
 
         private void rollBackBtn_Click(object sender, EventArgs e)
         {
-            this.picBox.Image = bitmap;
+            this.picBox.Image = getOriginBitmap();
         }
 
         private void calFpfh_Click(object sender, EventArgs e)
@@ -174,17 +187,68 @@ namespace sift
             byte[] dataImg = new byte[colorDepthBitmap.Width * colorDepthBitmap.Height * 4];
             for (int i = 0; i < filterPointClouds.Count; i++)
             {
-                int x = filterPointClouds[i].Pic_X;
-                int y = filterPointClouds[i].Pic_Y;
-                dataImg[(x + y * bitmap.Width) * 4] = rgbaData[(x + y * bitmap.Width) * 4];
-                dataImg[(x + y * bitmap.Width) * 4 + 1] = rgbaData[(x + y * bitmap.Width) * 4 + 1];
-                dataImg[(x + y * bitmap.Width) * 4 + 2] = rgbaData[(x + y * bitmap.Width) * 4 + 2];
-                dataImg[(x + y * bitmap.Width) * 4 + 3] = rgbaData[(x + y * bitmap.Width) * 4 + 3];
+                int x = (int)filterPointClouds[i].Pic_X;
+                int y = (int)filterPointClouds[i].Pic_Y;
+                dataImg[(x + y * bitmap.Width) * 4] = bgraData[(x + y * bitmap.Width) * 4];
+                dataImg[(x + y * bitmap.Width) * 4 + 1] = bgraData[(x + y * bitmap.Width) * 4 + 1];
+                dataImg[(x + y * bitmap.Width) * 4 + 2] = bgraData[(x + y * bitmap.Width) * 4 + 2];
+                dataImg[(x + y * bitmap.Width) * 4 + 3] = bgraData[(x + y * bitmap.Width) * 4 + 3];
             }
             Marshal.Copy(dataImg, 0, ptrSrc, dataImg.Length);
             colorDepthBitmap.UnlockBits(bitmapData);
             picBox.Image = colorDepthBitmap;
             filterPointCloud3d = filterPointClouds;
+        }
+
+        private void btnRgbD_Click(object sender, EventArgs e)
+        {
+            Bitmap bitmapGray = new Bitmap(bitmap.Width, bitmap.Height, PixelFormat.Format8bppIndexed);
+            ColorPalette palette = bitmapGray.Palette;
+            for (int i = 0; i < 256; i++)
+            {
+                palette.Entries[i] = Color.FromArgb(i, i, i);
+            }
+            bitmapGray.Palette = palette;
+            Rectangle rect = new Rectangle(0, 0, bitmap.Width, bitmap.Height);
+            BitmapData bmpData = bitmapGray.LockBits(rect, ImageLockMode.WriteOnly, bitmapGray.PixelFormat);
+            try
+            {
+                byte[] data = new byte[bitmap.Width * bitmap.Height];
+                for (int i = 0; i < bitmap.Height; i++)
+                {
+                    for (int j = 0; j < bitmap.Width; j++)
+                    {
+                        data[i * bitmap.Width + j] = (byte)(bgraData[(i * bitmap.Width + j) * 4] * 0.25F + 
+                            bgraData[(i * bitmap.Width + j) * 4 + 1] * 0.25F + 
+                            bgraData[(i * bitmap.Width + j) * 4 + 2] * 0.25F +
+                            depths[(i * bitmap.Width) + j] * 256 / 8000 * 0.25F);
+                    }
+                }
+                Marshal.Copy(data, 0, bmpData.Scan0, data.Length);
+            }
+            finally
+            {
+                bitmapGray.UnlockBits(bmpData);
+            }
+            picBox.Image = bitmapGray;
+        }
+
+        public Bitmap getOriginBitmap() {
+            Bitmap originBitmap = new Bitmap(bitmap.Width, bitmap.Height, PixelFormat.Format32bppArgb);
+            Rectangle ret = new Rectangle(0, 0, bitmap.Width, bitmap.Height);
+            BitmapData bitmapData = originBitmap.LockBits(ret, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            IntPtr ptrSrc = bitmapData.Scan0;
+            Marshal.Copy(oriBgraData, 0, ptrSrc, oriBgraData.Length);
+            originBitmap.UnlockBits(bitmapData);
+            return originBitmap;
+        }
+
+        private void btnPlyFile_Click(object sender, EventArgs e)
+        {
+            // 1. KD树生成, 并计算自身的法线 spfh值
+            KdTree kdTree = new KdTree(filterPointCloud3d);
+            PointFetures.getNormals(kdTree, filterPointCloud3d, 10);
+            PLY.writePlyFile("kinectPly.ply", filterPointCloud3d);
         }
     }
 }

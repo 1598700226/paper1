@@ -19,7 +19,10 @@ using Microsoft.Kinect;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using sift.PFH;
-using sift.PointCloud;
+using sift.PointCloudHandler;
+using MathNet.Numerics.LinearAlgebra;
+using sift.OpenTK;
+using System.Runtime.InteropServices.ComTypes;
 
 namespace sift
 {
@@ -34,6 +37,11 @@ namespace sift
         public float picScalaFactor = 1;
         /** kinect*/
         public CameraOpen cameraOpen = null;
+
+        /** dic*/
+        public int subsetSize = 31;
+        public int range = 100;
+        public double limitR = 0.9;
 
         /**
          * ImaShow窗口
@@ -140,7 +148,13 @@ namespace sift
         {
             isSelectRoi = true;
             roiVertex.Clear();
-            //
+        }
+
+
+        private void closeROIbtn_Click(object sender, EventArgs e)
+        {
+            roiVertex.Clear();
+            graphicsPicBox.Image = null;
         }
 
         private void siftBtn_Click(object sender, EventArgs e)
@@ -157,7 +171,6 @@ namespace sift
         private void saveLeftPicBtn_Click(object sender, EventArgs e)
         {
             SaveFileDialog dialog = new SaveFileDialog();
-
             dialog.FileName = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() + "图片"; //设置默认文件名
             dialog.Filter = "图片(*.bmp)|*.bmp";
             dialog.DefaultExt = "bmp";                                 //设置默认格式（可以不设）
@@ -166,58 +179,34 @@ namespace sift
                 firstPicBox.Image.Save(dialog.FileName);
             }
         }
+        private void saveRightPicBtn_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog dialog = new SaveFileDialog();
+            dialog.FileName = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() + "图片"; //设置默认文件名
+            dialog.Filter = "图片(*.bmp)|*.bmp";
+            dialog.DefaultExt = "bmp";                                 //设置默认格式（可以不设）
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                secondPicBox.Image.Save(dialog.FileName);
+            }
+        }
 
         private void lKFAToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Image<Gray, byte> imageRef = new Image<Gray, byte>(picturePath[0]);
-            Rectangle rectTemp = new Rectangle(30, 60, 100, 100);
-            Image<Gray, byte> imageRefTemp = new Image<Gray, byte>(rectTemp.Size);
-            imageRefTemp = imageRef.Copy(rectTemp);
-
-            Bitmap graphicBitmap = new Bitmap(graphicsPicBox.Width, graphicsPicBox.Height);
-            Graphics g = Graphics.FromImage(graphicBitmap);
-            Rectangle rectDraw = new Rectangle((int)(rectTemp.Left * picScalaFactor), (int)(rectTemp.Top * picScalaFactor), (int)(rectTemp.Width * picScalaFactor), (int)(rectTemp.Height * picScalaFactor));
-            g.DrawRectangle(new Pen(Color.Green, 3), rectDraw);
-            graphicsPicBox.Image = graphicBitmap; 
-
-            Image<Gray, byte> imageDef = new Image<Gray, byte>(picturePath[1]);
-            double[] p = new double[]{0.01, 0.01, 0.0, 0.0, 30.0,60.0};
-            ForwardAdditive.method(imageRefTemp, imageDef, p, rectTemp.Width, rectTemp.Height);
+            LKMethod.invoke(picturePath[0], picturePath[1], 31, 50, 50, 0, 0, LKMethodName.ICGN);
+            LKMethod.invoke(picturePath[0], picturePath[1], 31, 50, 50, 0, 0, LKMethodName.FAGN);
+            LKMethod.invoke(picturePath[0], picturePath[1], 31, 50, 50, 0, 0, LKMethodName.FCGN);
         }
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            /*            double[,] dR = new double[,] { { Math.Sqrt(2.0) / 2, Math.Sqrt(2.0) / 2, 0 },
-                            { -Math.Sqrt(2.0) / 2, Math.Sqrt(2.0) / 2, 0 },
-                        { 0, 0, 1 }};
-                        Matrix<double> Rz = new Matrix<double>(dR) ;
 
 
-
-                        double[,] pt = new double[,] { { 0, 1, 0 } };
-                        double[,] nt = new double[,] { { 0, 1, 0 } };
-                        double[,] ps = new double[,] { {1, 0, 0 } };
-                        double[,] ns = new double[,] { { 1, 0, 0 } };
-
-                        Matrix<double> mpt = new Matrix<double>(pt);
-                        Matrix<double> mps = new Matrix<double>(ps);
-                        Matrix<double> mpt_r = mpt.Mul(Rz);
-                        Matrix<double> mps_r = mps.Mul(Rz);
-                        pt[0, 0] = mpt_r.Data[0, 0];
-                        pt[0, 1] = mpt_r.Data[0, 1];
-                        pt[0, 2] = mpt_r.Data[0, 2];
-                        ps[0, 0] = mps_r.Data[0, 0];
-                        ps[0, 1] = mps_r.Data[0, 1];
-                        ps[0, 2] = mps_r.Data[0, 2];
-
-                        double f1, f2, f3, f4;
-                        PointFetures.pfh(pt, pt, ps, ps, out f1, out f2, out f3, out f4);
-                        KdTree.test();
-                        SvdRT.testN();*/
-
-            //KdTree.test();
             MatchingAlgorithm.test();
+            PLY.test();
             int a = 0;
+            //_3DShow ss = new _3DShow();
+            //ss.Show();
         }
 
         private void openKinectBtn_Click(object sender, EventArgs e)
@@ -230,13 +219,32 @@ namespace sift
             }
 
             cameraOpen = new CameraOpen();
-            cameraOpen.Init(firstPicBox, secondPicBox);
+            cameraOpen.Init(firstPicBox, secondPicBox, this);
             openKinectBtn.Text = "关闭";
         }
 
         private void 保存ToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            SaveFileDialog dialog = new SaveFileDialog();
+            dialog.FileName = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() + "图片"; //设置默认文件名
+            dialog.Filter = "图片(*.bmp)|*.bmp";
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                firstPicBox.Image.Save(dialog.FileName + "_RGB.bmp");
+                secondPicBox.Image.Save(dialog.FileName + "_Depth.bmp");
 
+                using (StreamWriter writer = new StreamWriter(dialog.FileName + "_config.txt"))
+                {
+                    
+                    writer.WriteLine("fx:" + cameraOpen.depthCameraIntrinsics.FocalLengthX);
+                    writer.WriteLine("fy:" + cameraOpen.depthCameraIntrinsics.FocalLengthY);
+                    writer.WriteLine("px" + cameraOpen.depthCameraIntrinsics.PrincipalPointX);
+                    writer.WriteLine("py" + cameraOpen.depthCameraIntrinsics.PrincipalPointY);
+                    writer.WriteLine("k1" + cameraOpen.depthCameraIntrinsics.RadialDistortionSecondOrder);
+                    writer.WriteLine("k2" + cameraOpen.depthCameraIntrinsics.RadialDistortionFourthOrder);
+                    writer.WriteLine("k2" + cameraOpen.depthCameraIntrinsics.RadialDistortionSixthOrder);
+                }
+            }
         }
 
         private void FusionBtn_Click(object sender, EventArgs e)
@@ -244,10 +252,19 @@ namespace sift
             if (cameraOpen == null) {
                 return;
             }
+            
+            List<System.Drawing.PointF> roi = new List<System.Drawing.PointF>();
+            if (roiVertex.Count > 0) {
+                foreach (Point item in roiVertex) {
+                    roi.Add(new System.Drawing.PointF(item.X / picScalaFactor, item.Y / picScalaFactor));
+                }
+            }
 
             lock (cameraOpen.colorPixels) {
                 ushort[] udepth = new ushort[cameraOpen.udepth.Length];
+                byte[] bytedepth = new byte[cameraOpen.depthPixels.Length];
                 cameraOpen.udepth.CopyTo(udepth, 0);
+                cameraOpen.depthPixels.CopyTo(bytedepth, 0);
                 ColorSpacePoint[] colorSpacePoints = new ColorSpacePoint[cameraOpen.colorSpacePoints.Length];
                 cameraOpen.colorSpacePoints.CopyTo(colorSpacePoints, 0);
                 byte[] colorPixels = new byte[cameraOpen.colorPixels.Length];
@@ -263,6 +280,7 @@ namespace sift
                 BitmapData bitmapData = colorDepthBitmap.LockBits(ret, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
                 IntPtr ptrSrc = bitmapData.Scan0;
                 byte[] dataImg = new byte[colorDepthBitmap.Width * colorDepthBitmap.Height * 4];
+                byte[] oriDataImg = new byte[colorDepthBitmap.Width * colorDepthBitmap.Height * 4];
 
                 Bitmap bmp = ((Bitmap)firstPicBox.Image);
                 for (int i = 0; i < colorSpacePoints.Length; i++)
@@ -270,8 +288,49 @@ namespace sift
                     int x = (int)colorSpacePoints[i].X;
                     int y = (int)colorSpacePoints[i].Y;
 
-                    // 直通滤波，限制z范围点云, 单位mm
-                    if (udepth[i] < 500 || udepth[i] > 1000) {
+                    if (x >= 0 && x < colorWidth &&
+                        y >= 0 && y < colorHeight)
+                    {
+                        oriDataImg[i * 4] = colorPixels[(x + y * colorWidth) * 4];
+                        oriDataImg[i * 4 + 1] = colorPixels[(x + y * colorWidth) * 4 + 1];
+                        oriDataImg[i * 4 + 2] = colorPixels[(x + y * colorWidth) * 4 + 2];
+                        oriDataImg[i * 4 + 3] = colorPixels[(x + y * colorWidth) * 4 + 3];
+                    }
+                    /*                    
+                        // 直通滤波，限制z范围点云, 单位mm
+                        if (udepth[i] < 500 || udepth[i] > 2000) {
+                            udepth[i] = 0;
+                            dataImg[i * 4] = 255;
+                            dataImg[i * 4 + 1] = 255;
+                            dataImg[i * 4 + 2] = 255;
+                            dataImg[i * 4 + 3] = 255;
+                            continue;
+                        }
+                    */
+                    // 区域选择
+                    if (roiVertex.Count > 0)
+                    {
+                        if (Algorithm.IsInPolygonF(new System.Drawing.PointF(colorSpacePoints[i].X, colorSpacePoints[i].Y), roi))
+                        {
+                            dataImg[i * 4] = colorPixels[(x + y * colorWidth) * 4];
+                            dataImg[i * 4 + 1] = colorPixels[(x + y * colorWidth) * 4 + 1];
+                            dataImg[i * 4 + 2] = colorPixels[(x + y * colorWidth) * 4 + 2];
+                            dataImg[i * 4 + 3] = colorPixels[(x + y * colorWidth) * 4 + 3];
+                        }
+                        else
+                        {
+                            udepth[i] = 0;
+                            dataImg[i * 4] = 255;
+                            dataImg[i * 4 + 1] = 255;
+                            dataImg[i * 4 + 2] = 255;
+                            dataImg[i * 4 + 3] = 255;
+                        }
+                        continue;
+                    }
+
+                    if (x < 0 || x >= colorWidth ||
+                        y < 0 || y >= colorHeight)
+                    {
                         udepth[i] = 0;
                         dataImg[i * 4] = 255;
                         dataImg[i * 4 + 1] = 255;
@@ -279,27 +338,19 @@ namespace sift
                         dataImg[i * 4 + 3] = 255;
                         continue;
                     }
-
-                    if (x <= 0 || x >= colorWidth ||
-                        y <= 0 || y >= colorHeight)
-                    {
-                        dataImg[i * 4] = 255;
-                        dataImg[i * 4 + 1] = 255;
-                        dataImg[i * 4 + 2] = 255;
-                        dataImg[i * 4 + 3] = 255;
-                    }
                     else
                     {
                         dataImg[i * 4] = colorPixels[(x + y * colorWidth)*4];
                         dataImg[i * 4 + 1] = colorPixels[(x + y * colorWidth)*4 + 1];
                         dataImg[i * 4 + 2] = colorPixels[(x + y * colorWidth)*4 + 2];
                         dataImg[i * 4 + 3] = colorPixels[(x + y * colorWidth)*4 + 3];
+                        continue;
                     }
                 }
                 Marshal.Copy(dataImg, 0, ptrSrc, dataImg.Length);
                 colorDepthBitmap.UnlockBits(bitmapData);
 
-                ImgShow img = new ImgShow(colorDepthBitmap, udepth, cameraOpen.depthCameraIntrinsics, dataImg, this);
+                ImgShow img = new ImgShow(colorDepthBitmap, udepth, bytedepth, cameraOpen.depthCameraIntrinsics, dataImg, oriDataImg, this);
                 img.Show();
                 imgShows.Add(img);
             }
@@ -307,17 +358,112 @@ namespace sift
 
         private void calculateCloudRT_Click(object sender, EventArgs e)
         {
-            if (imgShows.Count < 2) {
+            if (imgShows.Count < 2)
+            {
                 return;
             }
 
-            List<PointCloud3D> spointClouds;
-            List<PointCloud3D> tpointClouds;
-            MatchingAlgorithm.pointCloudMatch(imgShows[0].filterPointCloud3d, imgShows[1].filterPointCloud3d, double.MinValue, out spointClouds, out tpointClouds);
+            Image<Gray, Byte> sourecImage = BitmapExtensions.ToGrayImage(imgShows[0].getOriginBitmap());
+            Image<Gray, Byte> targetImage = BitmapExtensions.ToGrayImage(imgShows[1].getOriginBitmap());
+            List<MatchPointResult> matchPointResults;
+            MatchingAlgorithm.PointCloudMatch(imgShows[0].filterPointCloud3d, sourecImage, targetImage, out matchPointResults, subsetSize, range, limitR);
+
+            List<PointCloud3D> pointCloud3Ds1 = new List<PointCloud3D>();
+            List<PointCloud3D> pointCloud3Ds2 = new List<PointCloud3D>();
+            for (int i = 0; i < matchPointResults.Count; i++) {
+                double pic1_x = matchPointResults[i].X;
+                double pic1_y = matchPointResults[i].Y;
+                double pic1_z = imgShows[0].getDepthPixelByPicXY(pic1_x, pic1_y);
+                double z1_mm = imgShows[0].getDepthByPicXY(pic1_x, pic1_y);
+                double x1_mm, y1_mm;
+                imgShows[0].calculateWorldXY(pic1_x, pic1_y, z1_mm, out x1_mm, out y1_mm);
+
+                double pic2_x = matchPointResults[i].match_X;
+                double pic2_y = matchPointResults[i].match_Y;
+                double pic2_z = imgShows[1].getDepthPixelByPicXY(pic1_x, pic1_y);
+                double z2_mm = imgShows[1].getDepthByPicXY(pic2_x, pic2_y);
+                double x2_mm, y2_mm;
+                imgShows[1].calculateWorldXY(pic2_x, pic2_y, z2_mm, out x2_mm, out y2_mm);
+
+                if (z1_mm == 0 || z2_mm == 0)
+                    continue;
+                pointCloud3Ds1.Add(new PointCloud3D(x1_mm, y1_mm, z1_mm, pic1_x, pic1_y, pic1_z));
+                pointCloud3Ds2.Add(new PointCloud3D(x2_mm, y2_mm, z2_mm, pic2_x, pic2_y, pic2_z));
+            }
 
             double[,] r;
-            double[] t;   
-            SvdRT.RegisterPointCloud(spointClouds, tpointClouds, out r, out t);
+            double[] t;
+            SvdRT.RegisterPointCloud(pointCloud3Ds2, pointCloud3Ds1, out r, out t);
+            MathNet.Numerics.LinearAlgebra.Matrix<double> mr;
+            Vector<double> vt;
+            ICP.iteration(pointCloud3Ds2, pointCloud3Ds1, out mr, out vt);
+            List<PointCloud3D> pointCloud3Ds2to1 = ICP.transformListPointClouds(pointCloud3Ds2, mr, vt);
+            foreach (PointCloud3D item in pointCloud3Ds2to1)
+            {
+                double z_mm = imgShows[0].getDepthByPicXY(item.Pic_X, item.Pic_Y);
+                double x_mm, y_mm;
+                imgShows[0].calculateWorldXY(item.Pic_X, item.Pic_Y, z_mm, out x_mm, out y_mm);
+                item.X = x_mm;
+                item.Y = y_mm;
+                item.Z = z_mm;
+            }
+            _3DShow dShow = new _3DShow(pointCloud3Ds1, null, pointCloud3Ds2to1, null);
+            dShow.Show();
+            
         }
+
+        private void ShowMatchResultBtn_Click(object sender, EventArgs e)
+        {
+            if (imgShows.Count < 2)
+            {
+                return;
+            }
+
+            List<Bitmap> bitmaps = new List<Bitmap>();
+            foreach (ImgShow imshow in imgShows)
+            {
+                bitmaps.Add(imshow.bitmap);
+            }
+
+            List<List<MatchPointResult>> matchPointResultss = new List<List<MatchPointResult>>();
+            for (int i = 0; i < imgShows.Count - 1; i++)
+            {
+                Image<Gray, Byte> sourecImage = BitmapExtensions.ToGrayImage(imgShows[i].getOriginBitmap());
+                Image<Gray, Byte> targetImage = BitmapExtensions.ToGrayImage(imgShows[i + 1].getOriginBitmap());
+                List<MatchPointResult> matchPointResults;
+                MatchingAlgorithm.PointCloudMatch(imgShows[i].filterPointCloud3d, sourecImage, targetImage, out matchPointResults, subsetSize, range, limitR);
+                matchPointResultss.Add(matchPointResults);
+            }
+            MatchPointShow matchPointShow = new MatchPointShow(bitmaps.ToArray(), matchPointResultss);
+            matchPointShow.Show();
+        }
+
+        private void Show3DBtn_Click(object sender, EventArgs e)
+        {
+            for (int i = 0; i < imgShows.Count; i++)
+            {
+                List<PointCloud3D> pointCloud3Ds = imgShows[i].filterPointCloud3d;
+                List<Color> colors = new List<Color>();
+                foreach (PointCloud3D item in pointCloud3Ds)
+                {
+                    colors.Add(imgShows[i].GetColor((int)item.Pic_X, (int)item.Pic_Y));
+                }
+
+                _3DShow dShow = new _3DShow(pointCloud3Ds, colors);
+                dShow.Show();
+            }
+        }
+
+        private void openTkTest_Click(object sender, EventArgs e)
+        {
+            using (Learn game = new Learn(800, 600, "LearnOpenTK"))
+            {
+                //Run takes a double, which is how many frames per second it should strive to reach.
+                //You can leave that out and it'll just update as fast as the hardware will allow it.
+                game.Run(60.0);
+            }
+
+        }
+
     }
 }

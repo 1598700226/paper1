@@ -32,19 +32,24 @@
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.operateBtn = new System.Windows.Forms.ToolStripDropDownButton();
             this.roiSelect = new System.Windows.Forms.ToolStripMenuItem();
+            this.closeROIbtn = new System.Windows.Forms.ToolStripMenuItem();
             this.saveLeftPicBtn = new System.Windows.Forms.ToolStripMenuItem();
             this.alBtn = new System.Windows.Forms.ToolStripDropDownButton();
             this.siftBtn = new System.Windows.Forms.ToolStripMenuItem();
             this.sparkBtn = new System.Windows.Forms.ToolStripMenuItem();
             this.lKFAToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.openTkTest = new System.Windows.Forms.ToolStripMenuItem();
             this.kinectToolBtn = new System.Windows.Forms.ToolStripDropDownButton();
             this.openKinectBtn = new System.Windows.Forms.ToolStripMenuItem();
             this.保存ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.FusionBtn = new System.Windows.Forms.ToolStripMenuItem();
+            this.Show3DBtn = new System.Windows.Forms.ToolStripMenuItem();
+            this.ShowMatchResultBtn = new System.Windows.Forms.ToolStripMenuItem();
+            this.calculateCloudRT = new System.Windows.Forms.ToolStripMenuItem();
             this.firstPicOpenBtn = new System.Windows.Forms.Button();
             this.firstPicBox = new System.Windows.Forms.PictureBox();
             this.secondPicBox = new System.Windows.Forms.PictureBox();
-            this.calculateCloudRT = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveRightPicBtn = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.firstPicBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.secondPicBox)).BeginInit();
@@ -68,7 +73,9 @@
             this.operateBtn.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.operateBtn.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.roiSelect,
-            this.saveLeftPicBtn});
+            this.closeROIbtn,
+            this.saveLeftPicBtn,
+            this.saveRightPicBtn});
             this.operateBtn.Image = ((System.Drawing.Image)(resources.GetObject("operateBtn.Image")));
             this.operateBtn.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.operateBtn.Name = "operateBtn";
@@ -81,6 +88,13 @@
             this.roiSelect.Size = new System.Drawing.Size(270, 34);
             this.roiSelect.Text = "ROI选择";
             this.roiSelect.Click += new System.EventHandler(this.roiSelect_Click);
+            // 
+            // closeROIbtn
+            // 
+            this.closeROIbtn.Name = "closeROIbtn";
+            this.closeROIbtn.Size = new System.Drawing.Size(270, 34);
+            this.closeROIbtn.Text = "关闭ROI选择";
+            this.closeROIbtn.Click += new System.EventHandler(this.closeROIbtn_Click);
             // 
             // saveLeftPicBtn
             // 
@@ -95,11 +109,12 @@
             this.alBtn.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.siftBtn,
             this.sparkBtn,
-            this.lKFAToolStripMenuItem});
+            this.lKFAToolStripMenuItem,
+            this.openTkTest});
             this.alBtn.Image = ((System.Drawing.Image)(resources.GetObject("alBtn.Image")));
             this.alBtn.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.alBtn.Name = "alBtn";
-            this.alBtn.Size = new System.Drawing.Size(100, 28);
+            this.alBtn.Size = new System.Drawing.Size(100, 33);
             this.alBtn.Text = "算法测试";
             // 
             // siftBtn
@@ -122,6 +137,13 @@
             this.lKFAToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
             this.lKFAToolStripMenuItem.Text = "LK-FA";
             this.lKFAToolStripMenuItem.Click += new System.EventHandler(this.lKFAToolStripMenuItem_Click);
+            // 
+            // openTkTest
+            // 
+            this.openTkTest.Name = "openTkTest";
+            this.openTkTest.Size = new System.Drawing.Size(270, 34);
+            this.openTkTest.Text = "OpenTK测试";
+            this.openTkTest.Click += new System.EventHandler(this.openTkTest_Click);
             // 
             // kinectToolBtn
             // 
@@ -150,10 +172,34 @@
             // 
             // FusionBtn
             // 
+            this.FusionBtn.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.Show3DBtn,
+            this.ShowMatchResultBtn});
             this.FusionBtn.Name = "FusionBtn";
             this.FusionBtn.Size = new System.Drawing.Size(270, 34);
             this.FusionBtn.Text = "融合";
             this.FusionBtn.Click += new System.EventHandler(this.FusionBtn_Click);
+            // 
+            // Show3DBtn
+            // 
+            this.Show3DBtn.Name = "Show3DBtn";
+            this.Show3DBtn.Size = new System.Drawing.Size(270, 34);
+            this.Show3DBtn.Text = "3D显示";
+            this.Show3DBtn.Click += new System.EventHandler(this.Show3DBtn_Click);
+            // 
+            // ShowMatchResultBtn
+            // 
+            this.ShowMatchResultBtn.Name = "ShowMatchResultBtn";
+            this.ShowMatchResultBtn.Size = new System.Drawing.Size(270, 34);
+            this.ShowMatchResultBtn.Text = "显示匹配结果";
+            this.ShowMatchResultBtn.Click += new System.EventHandler(this.ShowMatchResultBtn_Click);
+            // 
+            // calculateCloudRT
+            // 
+            this.calculateCloudRT.Name = "calculateCloudRT";
+            this.calculateCloudRT.Size = new System.Drawing.Size(270, 34);
+            this.calculateCloudRT.Text = "点云计算RT";
+            this.calculateCloudRT.Click += new System.EventHandler(this.calculateCloudRT_Click);
             // 
             // firstPicOpenBtn
             // 
@@ -167,7 +213,7 @@
             // 
             // firstPicBox
             // 
-            this.firstPicBox.Location = new System.Drawing.Point(12, 73);
+            this.firstPicBox.Location = new System.Drawing.Point(16, 126);
             this.firstPicBox.Name = "firstPicBox";
             this.firstPicBox.Size = new System.Drawing.Size(500, 400);
             this.firstPicBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
@@ -176,19 +222,19 @@
             // 
             // secondPicBox
             // 
-            this.secondPicBox.Location = new System.Drawing.Point(518, 73);
+            this.secondPicBox.Location = new System.Drawing.Point(522, 126);
             this.secondPicBox.Name = "secondPicBox";
             this.secondPicBox.Size = new System.Drawing.Size(500, 400);
             this.secondPicBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.secondPicBox.TabIndex = 4;
             this.secondPicBox.TabStop = false;
             // 
-            // calculateCloudRT
+            // saveRightPicBtn
             // 
-            this.calculateCloudRT.Name = "calculateCloudRT";
-            this.calculateCloudRT.Size = new System.Drawing.Size(270, 34);
-            this.calculateCloudRT.Text = "两幅点云计算RT";
-            this.calculateCloudRT.Click += new System.EventHandler(this.calculateCloudRT_Click);
+            this.saveRightPicBtn.Name = "saveRightPicBtn";
+            this.saveRightPicBtn.Size = new System.Drawing.Size(270, 34);
+            this.saveRightPicBtn.Text = "保存右图";
+            this.saveRightPicBtn.Click += new System.EventHandler(this.saveRightPicBtn_Click);
             // 
             // MainForm
             // 
@@ -232,6 +278,11 @@
         private System.Windows.Forms.ToolStripMenuItem 保存ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem FusionBtn;
         private System.Windows.Forms.ToolStripMenuItem calculateCloudRT;
+        private System.Windows.Forms.ToolStripMenuItem ShowMatchResultBtn;
+        private System.Windows.Forms.ToolStripMenuItem closeROIbtn;
+        private System.Windows.Forms.ToolStripMenuItem Show3DBtn;
+        private System.Windows.Forms.ToolStripMenuItem openTkTest;
+        private System.Windows.Forms.ToolStripMenuItem saveRightPicBtn;
     }
 }
 
