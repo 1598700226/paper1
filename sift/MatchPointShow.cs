@@ -56,8 +56,8 @@ namespace sift
 
                 for(int i = 0; i < bitmaps.Length; i++) 
                 {
-                    int x = i % bitmaps.Length;
-                    int y = i / bitmaps.Length;
+                    int x = i % picColNum;
+                    int y = i / picColNum;
                     graphics.DrawImage(bitmaps[i], new Rectangle(x * picBoxW, y * picBoxH, picBoxW, picBoxH));
                 }
             }
@@ -99,7 +99,7 @@ namespace sift
                     List<MatchPointResult> MatchPointResults = MatchPointResultss[i];
                     foreach (MatchPointResult item in MatchPointResults)
                     {
-                        Point startP = convertGraphicsPixBoxLoc(0, (int)item.X, (int)item.Y);
+                        Point startP = convertGraphicsPixBoxLoc(i, (int)item.X, (int)item.Y);
 
                         int ex = (int)Math.Round(item.match_X, 2);
                         int ey = (int)Math.Round(item.match_Y, 2);

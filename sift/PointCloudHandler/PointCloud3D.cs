@@ -1,4 +1,8 @@
-﻿using Emgu.CV.OCR;
+﻿using Emgu.CV.Flann;
+using Emgu.CV.OCR;
+using MathNet.Numerics.LinearAlgebra;
+using MathNet.Numerics.LinearAlgebra.Single;
+using MathNet.Numerics.Optimization;
 using Microsoft.Kinect;
 using System;
 using System.Collections.Generic;
@@ -75,16 +79,16 @@ namespace sift.PointCloudHandler
                 double x_mm = item.X;
                 double y_mm = item.Y;
 
+                if (z_mm < 0)
+                {
+                    continue;
+                }
                 zmin = zmin < z_mm ? zmin : z_mm;
                 zmax = zmax > z_mm ? zmax : z_mm;
                 xmin = xmin < x_mm ? xmin : x_mm;
                 xmax = xmax > x_mm ? xmax : x_mm;
                 ymin = ymin < y_mm ? ymin : y_mm;
                 ymax = ymax > y_mm ? ymax : y_mm;
-                if (z_mm <= 0)
-                {
-                    continue;
-                }
             }
 
             // 2.计算维度, 根据维度排序
@@ -106,56 +110,19 @@ namespace sift.PointCloudHandler
             {
                 if (pointCloud3Ds[i].H == pointCloud3Ds[i + 1].H)
                 {
-                    // 防止到最后
-                    if (i == pointCloud3Ds.Count - 2)
-                    {
-                        double x, y, z;
-                        double pic_x, pic_y, pic_z;
-                        x = y = z = 0;
-                        pic_x = pic_y = pic_z = 0;
-                        for (int index = j; index < i + 1; index++)
-                        {
-                            x += pointCloud3Ds[index].X;
-                            y += pointCloud3Ds[index].Y;
-                            z += pointCloud3Ds[index].Z;
-                            pic_x += pointCloud3Ds[i].Pic_X;
-                            pic_y += pointCloud3Ds[i].Pic_Y;
-                            pic_z += pointCloud3Ds[i].Pic_Z;
-                        }
-                        x = x / (i + 1 - j);
-                        y = y / (i + 1 - j);
-                        z = z / (i + 1 - j);
-                        pic_x = pic_x / (i + 1 - j);
-                        pic_y = pic_y / (i + 1 - j);
-                        pic_z = pic_z / (i + 1 - j);
-                        filterPointClouds.Add(new PointCloud3D(x, y, z, pic_x, pic_y, pic_z));
-                    }
                     continue;
                 }
                 else
                 {
                     double x, y, z;
                     double pic_x, pic_y, pic_z;
-                    x = y = z = 0;
-                    pic_x = pic_y = pic_z = 0;
-                    for (int index = j; index < i + 1; index++)
-                    {
-                        x += pointCloud3Ds[index].X;
-                        y += pointCloud3Ds[index].Y;
-                        z += pointCloud3Ds[index].Z;
-                        pic_x += pointCloud3Ds[i].Pic_X;
-                        pic_y += pointCloud3Ds[i].Pic_Y;
-                        pic_z += pointCloud3Ds[i].Pic_Z;
-                    }
-                    x = x / (i + 1 - j);
-                    y = y / (i + 1 - j);
-                    z = z / (i + 1 - j);
-                    pic_x = pic_x / (i + 1 - j);
-                    pic_y = pic_y / (i + 1 - j);
-                    pic_z = pic_z / (i + 1 - j);
+                    x = pointCloud3Ds[i].X;
+                    y = pointCloud3Ds[i].Y;
+                    z = pointCloud3Ds[i].Z;
+                    pic_x = pointCloud3Ds[i].Pic_X;
+                    pic_y = pointCloud3Ds[i].Pic_Y;
+                    pic_z = pointCloud3Ds[i].Pic_Z;
                     filterPointClouds.Add(new PointCloud3D(x, y, z, pic_x, pic_y, pic_z));
-                    // 记录上次的起始位置
-                    j = i + 1;
                 }
             }
 
@@ -249,6 +216,69 @@ namespace sift.PointCloudHandler
             }
             afterRemove = pointCloud3Ds.Except(Remove).ToList();
             return afterRemove;
+        }
+
+        // 根据Z的深度直通滤波
+        public static List<PointCloud3D> DirectFiltingByWorldZmm(List<PointCloud3D> pointCloud3Ds, int max, int min) { 
+            List<PointCloud3D> filterPointClouds = new List<PointCloud3D>();
+            foreach (PointCloud3D item in pointCloud3Ds)
+            {
+                if (item.Z > min && item.Z < max) { 
+                    filterPointClouds.Add(item);
+                }
+            }
+            return filterPointClouds;
+        }
+
+        // 去除地面点云
+        public static List<PointCloud3D> GroundFilting(List<PointCloud3D> pointCloud3Ds, int iterationMax, double error) {
+            List<PointCloud3D> filterPointClouds = pointCloud3Ds.ToList();
+            // 1.Ransac算法 随机取3点 并找到最优的平面
+            int iteration = 0;
+            Random randomGenerator = new Random();
+            List<PointCloud3D> bestInlines = new List<PointCloud3D>();
+            while (iteration < iterationMax) { 
+                iteration++;
+                Vector<double>[] randomPcs = new Vector<double>[3];
+                for (int i = 0; i < randomPcs.Length; i++) {
+                    int index = randomGenerator.Next(0, pointCloud3Ds.Count);
+                    PointCloud3D item = pointCloud3Ds[index];
+                    randomPcs[i] = Vector<double>.Build.Dense(new double[] { item.X, item.Y, item.Z });
+                }
+                Vector<double> v01 = Vector<double>.Build.Dense(new double[] { 
+                    randomPcs[1][0] - randomPcs[0][0],
+                    randomPcs[1][1] - randomPcs[0][1],
+                    randomPcs[1][2] - randomPcs[0][2]});
+                Vector<double> v02 = Vector<double>.Build.Dense(new double[] { 
+                    randomPcs[2][0] - randomPcs[0][0],
+                    randomPcs[2][1] - randomPcs[0][1],
+                    randomPcs[2][2] - randomPcs[0][2]});
+                Vector<double> normal = Vector<double>.Build.Dense(new double[] {
+                    v01[1] * v02[2] - v01[2] * v02[1],
+                    v01[2] * v02[0] - v01[0] * v02[2],
+                    v01[0] * v02[1] - v01[1] * v02[0]});
+                // Ax + By + Cz + D = 0 得到参数
+                normal = normal.Normalize(1);
+                double d = -(normal[0] * randomPcs[0][0] + normal[1] * randomPcs[0][1] + normal[2] * randomPcs[0][2]);
+                double[] model = new double[4] { normal[0], normal[1], normal[2], d };
+
+                // 统计inliers
+                List<PointCloud3D> inliers = new List<PointCloud3D>();
+                for (int i = 0; i < pointCloud3Ds.Count; i++)
+                {
+                    PointCloud3D item = pointCloud3Ds[i];
+                    double dis = Math.Abs(item.X * model[0] + item.Y * model[1] + item.Z * model[2] + model[3]);
+                    if (dis <= error)
+                    {
+                        inliers.Add(item);
+                    }
+                }
+                if (inliers.Count > bestInlines.Count) {
+                    bestInlines = inliers.ToList();
+                }
+            }
+
+            return filterPointClouds.Except(bestInlines).ToList();
         }
     }
 }

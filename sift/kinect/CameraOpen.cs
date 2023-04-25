@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using Emgu.CV.DepthAI;
 using Emgu.CV.Reg;
 using Microsoft.Kinect;
+using sift.common;
 
 namespace sift.kinect
 {
@@ -23,11 +24,11 @@ namespace sift.kinect
         /// <summary>
         /// Map depth range to byte range
         /// </summary>
-        private const int MapDepthToByte = 8000 / 256;
+        public const int MapDepthToByte = 8000 / 256;
         /// <summary>
         /// Active Kinect sensor
         /// </summary>
-        private KinectSensor kinectSensor = null;
+        public KinectSensor kinectSensor = null;
 
         private ColorFrameReader colorFrameReader = null;
         private DepthFrameReader depthFrameReader = null;
@@ -142,8 +143,8 @@ namespace sift.kinect
                                 //this.depthPixels[i] = (byte)(depth >= depthFrame.DepthMinReliableDistance && depth <= maxDepth ? (depth / MapDepthToByte) : 0);
                                 this.depthPixels[i] = (byte)(depth >= depthFrame.DepthMinReliableDistance && depth <= maxDepth ? (depth / MapDepthToByte) : 0);
                             }
-
-                            kinectSensor.CoordinateMapper.MapDepthFrameToColorSpace(udepth, colorSpacePoints);
+                            //kinectSensor.CoordinateMapper.
+                            //(udepth, colorSpacePoints);
 
                             depthFrameProcessed = true;
                         }

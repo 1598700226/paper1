@@ -11,8 +11,6 @@ namespace sift.PFH
 {
     public static class PointFetures
     {
-        private static double[,] oPoint = new double[1, 3] { { 0, 0, 0 } };
-
         /// <summary>
         /// 计算PFH
         /// https://www.freesion.com/article/16421482146/
@@ -81,55 +79,6 @@ namespace sift.PFH
 
             return true;
         }
-
-        // 根据近邻点计算spfh的值
-/*        public static bool SPFH(KdTree pointKdTree, PointCloud3D pointCloud3D, int range)
-        {
-            bool ret = false;
-            if (pointCloud3D.hasNormal == false) {
-                return ret;
-            }
-
-            List<PointCloud3D> pointCloud3Ds = pointKdTree.RNearestNeighbors(pointCloud3D, range);
-            if (pointCloud3Ds.Count == 0)
-            {
-                return ret;
-            }
-
-
-            int length = 11;
-            int[] alpha = new int[length];
-            int[] fai = new int[length];
-            int[] theta = new int[length];
-            SPFH spfh = new SPFH(alpha, fai, theta, length);
-
-
-            for (int i = 0; i < pointCloud3Ds.Count; i++)
-            {
-                if (pointCloud3Ds[i].hasNormal == false) {
-                    continue;
-                }
-
-                double[,] pt = pointCloud3Ds[i].pointCloud2double();
-                double[,] nt = pointCloud3Ds[i].n;
-                double[,] ps = pointCloud3D.pointCloud2double();
-                double[,] ns = pointCloud3D.n;
-                double f1, f2, f3, f4;
-                bool pfhResult = pfh(ps, ns, pt, nt, out f1, out f2, out f3, out f4);
-                if (pfhResult == false)
-                {
-                    continue;
-                }
-                spfh.AddFeatureStatistic(ref spfh.alpha, f1);
-                spfh.AddFeatureStatistic(ref spfh.fai, f2);
-                spfh.AddFeatureStatistic(ref spfh.theta, f3);
-                ret = true;
-            }
-
-            pointCloud3D.hasSpfh = ret;
-            pointCloud3D.spfh = spfh.ToDoubleArray();
-            return ret;
-        }*/
 
         // 根据近邻点计算spfh的值
         public static bool SPFH(KdTree pointKdTree, PointCloud3D pointCloud3D, int range)

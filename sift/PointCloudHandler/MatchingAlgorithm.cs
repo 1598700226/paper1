@@ -142,7 +142,7 @@ namespace sift.PointCloudHandler
             double dif_x = xt - integerCoordinate_x;
             double dif_y = yt - integerCoordinate_y;
             Rectangle rect_t = new Rectangle(integerCoordinate_x - subsetSizeWidth / 2, integerCoordinate_y - subsetSizeHeight / 2, subsetSizeWidth + 1, subsetSizeHeight + 1);
-            Image<Gray, float> image_t = tempImg.GetSubRect(rect_t).Convert<Gray, float>(); ;
+            Image<Gray, float> image_t = tempImg.GetSubRect(rect_t).Convert<Gray, float>();
             Image<Gray, float> img_t = new Image<Gray, float>(new Size(subsetSizeWidth, subsetSizeHeight));
             for (int iy = 0; iy < subsetSizeHeight; iy++)
                 for (int ix = 0; ix < subsetSizeWidth; ix++)
@@ -215,6 +215,94 @@ namespace sift.PointCloudHandler
 
             MatchPointResult matchPointResult = new MatchPointResult(xt, yt, sx, sy, max);
             return matchPointResult;
+        }
+
+        // 传的是弧度
+        public static double[] GetEllipseData(byte[] img, int w, int h, int R, Point centerMind, double Angle_x, double Angle_y, double Angle_z)
+        {
+            List<double> listByteData = new List<double>();
+            for (int i = 1; i <= R; i++)
+            {
+                int r = i;
+                double intervalAngle = 360.0 / (2 * Math.PI * (double)r);
+                double calAngle = 0; //初始计算角度
+                while (calAngle < 360)
+                {
+                    double x = 0, y = 0, angle = calAngle;
+                    if (angle >= 360)
+                        angle = angle - 360;
+                    x = (double)r * (Math.Cos(Math.PI * angle / 180.0) * Math.Cos(Angle_x) * Math.Cos(Angle_z) - Math.Sin(Math.PI * angle / 180.0) * Math.Cos(Angle_y) * Math.Sin(Angle_z));
+                    y = -(double)r * (Math.Cos(Math.PI * angle / 180.0) * Math.Cos(Angle_x) * Math.Sin(Angle_z) + Math.Sin(Math.PI * angle / 180.0) * Math.Cos(Angle_y) * Math.Cos(Angle_z));
+
+                    x = centerMind.X + x;
+                    y = centerMind.Y + y;
+                    int intx = (int)x;
+                    int inty = (int)y;
+
+                    int leftup_index = intx + inty * w;
+                    int leftdown_index = intx + (inty + 1) * w;
+                    int rightup_index = intx + 1 + inty * w;
+                    int rightdown_index = intx + 1 + (inty + 1) * w;
+
+                    double value = (1 - x + intx) * ((1 - y + inty) * img[leftup_index] + (y - inty) * img[leftdown_index]) +
+                        (x - intx) * ((1 - y + inty) * img[rightup_index] + (y - inty) * img[rightdown_index]);
+                    listByteData.Add(value);
+
+                    calAngle = calAngle + intervalAngle;
+                }
+
+            }
+            return listByteData.ToArray();
+        }
+
+        public static List<MatchPointResult> VariableCircleTemplateMatching(Bitmap sourceBitmap, Bitmap targetBitmap, 
+            List<MathNet.Numerics.LinearAlgebra.Matrix<double>> rotations, List<PointCloud3D> sourcePointCloud3Ds, 
+            int templateRadius, int searchRange, double limitR, List<MatchPointResult> mpr) {
+
+            List<MatchPointResult> matchPointResults = new List<MatchPointResult>();
+            MathNet.Numerics.LinearAlgebra.Matrix<double> transform = MathNet.Numerics.LinearAlgebra.Matrix<double>.Build.DenseIdentity(3, 3);
+            for (int i = 0; i < rotations.Count; i++)
+            {
+                transform = transform * rotations[i];
+            }
+            MathNet.Numerics.LinearAlgebra.Vector<double> euler = Algorithm.MatrixToEuler(transform);
+
+            byte[] sourceBitmapBytes = BitmapExtensions.ConvertTo8Byte(sourceBitmap);
+            byte[] targetBitmapBytes = BitmapExtensions.ConvertTo8Byte(targetBitmap);
+            int picWidth = sourceBitmap.Width;
+            int picHeight = sourceBitmap.Height;
+            for (int i = 0; i < sourcePointCloud3Ds.Count; i++) {
+                int x = (int)sourcePointCloud3Ds[i].Pic_X;
+                int y = (int)sourcePointCloud3Ds[i].Pic_Y;
+                double R = double.MinValue;
+                int match_x = 0;
+                int match_y = 0;
+
+                Point scenterPoint = new Point(x, y);
+                double[] simg = GetEllipseData(sourceBitmapBytes, picWidth, picHeight, templateRadius, scenterPoint, 0, 0, 0);
+                for (int search_x = -searchRange / 2; search_x < searchRange / 2; search_x++) {
+                    for (int search_y = -searchRange / 2; search_y < searchRange / 2; search_y++)
+                    {
+                        Point centerPoint = new Point(x + search_x, y + search_y);
+                        // 采样为负
+                        double[] timg = GetEllipseData(targetBitmapBytes, picWidth, picHeight, templateRadius, centerPoint, euler[0], euler[1], -euler[2]);
+                        double itemR = Correlation_coefficient(simg, timg);
+
+                        if (itemR > R) { 
+                            R = itemR;
+                            match_x = centerPoint.X; 
+                            match_y = centerPoint.Y;
+                        }
+                    }
+                }
+
+                if (R >= limitR) {
+                    MatchPointResult matchPointResult = new MatchPointResult(x, y, match_x, match_y, R);
+                    matchPointResults.Add(matchPointResult);
+                }
+            } 
+
+            return matchPointResults;
         }
 
         /**

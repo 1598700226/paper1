@@ -1,4 +1,6 @@
-﻿using System;
+﻿using sift.PFH;
+using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -26,7 +28,10 @@ namespace sift.PointCloudHandler
 
         public KdTree(List<PointCloud3D> points)
         {
-            root = BuildTree(points, 0);
+            // 深拷贝
+            List<PointCloud3D> copiedList = points.Select(item => new PointCloud3D(item.X, item.Y, item.Z)).ToList();
+            
+            root = BuildTree(copiedList, 0);
         }
 
         private KdNode BuildTree(List<PointCloud3D> points, int depth)

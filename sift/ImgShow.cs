@@ -70,7 +70,7 @@ namespace sift
                     }
                     double x_mm, y_mm;
                     calculateWorldXY(i, j, z_mm, out x_mm, out y_mm);
-                    double z = getDepthByPicXY(i, j);
+                    double z = getDepthPixelByPicXY(i, j);
                     pointCloud3Ds.Add(new PointCloud3D(x_mm, y_mm, z_mm, i, j, z));
                 }
             }
@@ -78,12 +78,20 @@ namespace sift
         }
 
         public double getDepthByPicXY(double x, double y) {
-            return Algorithm.bilinearInterpolation(depths, bitmap.Width, bitmap.Height, x, y);
+            int ix = (int)Math.Round(x, MidpointRounding.AwayFromZero);
+            int iy = (int)Math.Round(y, MidpointRounding.AwayFromZero);
+
+            return depths[(int)ix + (int)iy * bitmap.Width];
+            //return Algorithm.bilinearInterpolation(depths, bitmap.Width, bitmap.Height, x, y);
         }
 
         public double getDepthPixelByPicXY(double x, double y)
         {
-            return Algorithm.bilinearInterpolation(depthsPixel, bitmap.Width, bitmap.Height, x, y);
+            int ix = (int)Math.Round(x, MidpointRounding.AwayFromZero);
+            int iy = (int)Math.Round(y, MidpointRounding.AwayFromZero);
+
+            return depthsPixel[(int)ix + (int)iy * bitmap.Width];
+            //return Algorithm.bilinearInterpolation(depthsPixel, bitmap.Width, bitmap.Height, x, y);
         }
 
         private void picBox_MouseMove(object sender, MouseEventArgs e)
@@ -92,16 +100,17 @@ namespace sift
             int y = e.Y;
             int pic_x = (int)((double)x / (double)picBox.Width * (double)bitmap.Width);
             int pic_y = (int)((double)y / (double)picBox.Height * (double)bitmap.Height);
+            int pic_z = (int)getDepthPixelByPicXY(pic_x, pic_y);
             int z_mm = depths[(pic_x + pic_y * bitmap.Width)];
             double x_mm, y_mm;
             calculateWorldXY(pic_x, pic_y, z_mm, out x_mm, out y_mm);
-            infoLabel.Text = String.Format("x_mm:{0} y_mm:{1} z_mm:{2}; x:{3} y:{4}",
-                x_mm, y_mm, z_mm, x, y);
+            infoLabel.Text = String.Format("x_mm:{0:N} y_mm:{1:N} z_mm:{2:N}; x:{3} y:{4} z:{5}",
+                x_mm, y_mm, z_mm, pic_x, pic_y, pic_z);
         }
 
         private void downSamplingBtn_Click(object sender, EventArgs e)
         {
-            // 1.计算点云
+/*            // 1.计算点云
             List<PointCloud3D> pointCloud3Ds = new List<PointCloud3D>();
             for (int i = 0; i < bitmap.Width; i++)
             {
@@ -112,16 +121,16 @@ namespace sift
                     }
                     double x_mm, y_mm;
                     calculateWorldXY(i, j, z_mm, out x_mm, out y_mm);
-                    double z = getDepthByPicXY(i, j);
+                    double z = getDepthPixelByPicXY(i, j);
                     pointCloud3Ds.Add(new PointCloud3D(x_mm, y_mm, z_mm, i, j, z));
                 }
-            }
+            }*/
 
             // 2.点云降采样
-            List<PointCloud3D> filterPointClouds = PointCloud3D.downSamplingTisu(picBox.Image.Width, picBox.Image.Height, sampleRange, pointCloud3Ds);
+            filterPointCloud3d = PointCloud3D.downSamplingTisu(picBox.Image.Width, picBox.Image.Height, sampleRange, filterPointCloud3d);
 
             // 3.显示降采样后的点云
-            showCloudPoint3D(filterPointClouds);
+            showCloudPoint3D(filterPointCloud3d);
         }
 
         private void savePicBtn_Click(object sender, EventArgs e)
@@ -161,10 +170,32 @@ namespace sift
             this.picBox.Image = getOriginBitmap();
         }
 
+        private void rollBackBtn_Click_1(object sender, EventArgs e)
+        {
+            // 1.计算点云
+            List<PointCloud3D> pointCloud3Ds = new List<PointCloud3D>();
+            for (int i = 0; i < bitmap.Width; i++)
+            {
+                for (int j = 0; j < bitmap.Height; j++)
+                {
+                    int z_mm = depths[i + j * bitmap.Width];
+                    if (z_mm <= 0)
+                    {
+                        continue;
+                    }
+                    double x_mm, y_mm;
+                    calculateWorldXY(i, j, z_mm, out x_mm, out y_mm);
+                    double z = getDepthPixelByPicXY(i, j);
+                    pointCloud3Ds.Add(new PointCloud3D(x_mm, y_mm, z_mm, i, j, z));
+                }
+            }
+            filterPointCloud3d = pointCloud3Ds;
+            showCloudPoint3D(filterPointCloud3d);
+        }
+
         private void calFpfh_Click(object sender, EventArgs e)
         {
             PointFetures.FPFH(filterPointCloud3d, fpfhRange);
-            int a = 0;
         }
 
         private void ImgShow_FormClosing(object sender, FormClosingEventArgs e)
@@ -175,6 +206,12 @@ namespace sift
         private void btnOutliers_Click(object sender, EventArgs e)
         {
             filterPointCloud3d = PointCloud3D.RemoveOutliersByStatistic(filterPointCloud3d, 3);
+            showCloudPoint3D(filterPointCloud3d);
+        }
+
+        private void DirectFilteringBtn_Click(object sender, EventArgs e)
+        {
+            filterPointCloud3d = PointCloud3D.DirectFiltingByWorldZmm(filterPointCloud3d, 1500, 0);
             showCloudPoint3D(filterPointCloud3d);
         }
 
@@ -250,5 +287,17 @@ namespace sift
             PointFetures.getNormals(kdTree, filterPointCloud3d, 10);
             PLY.writePlyFile("kinectPly.ply", filterPointCloud3d);
         }
+
+        private void removeGround_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void removeGroundBtn_Click(object sender, EventArgs e)
+        {
+            filterPointCloud3d = PointCloud3D.GroundFilting(filterPointCloud3d, int.Parse(GroundFilteringIteration.Text), double.Parse(GroundFilteringError.Text));
+            showCloudPoint3D(filterPointCloud3d);
+        }
+
     }
 }

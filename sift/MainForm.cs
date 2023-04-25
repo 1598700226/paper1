@@ -40,8 +40,8 @@ namespace sift
 
         /** dic*/
         public int subsetSize = 31;
-        public int range = 100;
-        public double limitR = 0.9;
+        public int dicSearchRange = 50;
+        public double limitR = 0.90;
 
         /**
          * ImaShow窗口
@@ -200,7 +200,7 @@ namespace sift
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-
+            SvdRT.testRT();
 
             MatchingAlgorithm.test();
             PLY.test();
@@ -265,6 +265,7 @@ namespace sift
                 byte[] bytedepth = new byte[cameraOpen.depthPixels.Length];
                 cameraOpen.udepth.CopyTo(udepth, 0);
                 cameraOpen.depthPixels.CopyTo(bytedepth, 0);
+
                 ColorSpacePoint[] colorSpacePoints = new ColorSpacePoint[cameraOpen.colorSpacePoints.Length];
                 cameraOpen.colorSpacePoints.CopyTo(colorSpacePoints, 0);
                 byte[] colorPixels = new byte[cameraOpen.colorPixels.Length];
@@ -283,6 +284,27 @@ namespace sift
                 byte[] oriDataImg = new byte[colorDepthBitmap.Width * colorDepthBitmap.Height * 4];
 
                 Bitmap bmp = ((Bitmap)firstPicBox.Image);
+
+/*                udepth = BitmapExtensions.RadialDistortionCorrection(ref udepth, depthWidth, depthHeight,
+                    cameraOpen.depthCameraIntrinsics.RadialDistortionSecondOrder,
+                    cameraOpen.depthCameraIntrinsics.RadialDistortionFourthOrder,
+                    cameraOpen.depthCameraIntrinsics.RadialDistortionSixthOrder,
+                    cameraOpen.depthCameraIntrinsics.PrincipalPointX,
+                    cameraOpen.depthCameraIntrinsics.PrincipalPointY,
+                    cameraOpen.depthCameraIntrinsics.FocalLengthX,
+                    cameraOpen.depthCameraIntrinsics.FocalLengthY);
+                bytedepth = BitmapExtensions.RadialDistortionCorrection8byte(ref bytedepth, depthWidth, depthHeight,
+                    cameraOpen.depthCameraIntrinsics.RadialDistortionSecondOrder,
+                    cameraOpen.depthCameraIntrinsics.RadialDistortionFourthOrder,
+                    cameraOpen.depthCameraIntrinsics.RadialDistortionSixthOrder,
+                    cameraOpen.depthCameraIntrinsics.PrincipalPointX,
+                    cameraOpen.depthCameraIntrinsics.PrincipalPointY,
+                    cameraOpen.depthCameraIntrinsics.FocalLengthX,
+                    cameraOpen.depthCameraIntrinsics.FocalLengthY);*/
+
+                cameraOpen.kinectSensor.CoordinateMapper.MapDepthFrameToColorSpace(udepth, colorSpacePoints);
+
+                bool[] colorRecords = new bool[colorPixels.Length];
                 for (int i = 0; i < colorSpacePoints.Length; i++)
                 {
                     int x = (int)colorSpacePoints[i].X;
@@ -291,60 +313,62 @@ namespace sift
                     if (x >= 0 && x < colorWidth &&
                         y >= 0 && y < colorHeight)
                     {
+                        if (colorRecords[(x + y * colorWidth) * 4]) {
+                            continue;
+                        }
+
                         oriDataImg[i * 4] = colorPixels[(x + y * colorWidth) * 4];
                         oriDataImg[i * 4 + 1] = colorPixels[(x + y * colorWidth) * 4 + 1];
                         oriDataImg[i * 4 + 2] = colorPixels[(x + y * colorWidth) * 4 + 2];
                         oriDataImg[i * 4 + 3] = colorPixels[(x + y * colorWidth) * 4 + 3];
-                    }
-                    /*                    
-                        // 直通滤波，限制z范围点云, 单位mm
-                        if (udepth[i] < 500 || udepth[i] > 2000) {
-                            udepth[i] = 0;
-                            dataImg[i * 4] = 255;
-                            dataImg[i * 4 + 1] = 255;
-                            dataImg[i * 4 + 2] = 255;
-                            dataImg[i * 4 + 3] = 255;
-                            continue;
-                        }
-                    */
-                    // 区域选择
-                    if (roiVertex.Count > 0)
-                    {
-                        if (Algorithm.IsInPolygonF(new System.Drawing.PointF(colorSpacePoints[i].X, colorSpacePoints[i].Y), roi))
+
+                        /*
+                            // 直通滤波，限制z范围点云, 单位mm
+                            if (udepth[i] < 500 || udepth[i] > 1500)
+                            {
+                                udepth[i] = 0;
+                                dataImg[i * 4] = 255;
+                                dataImg[i * 4 + 1] = 255;
+                                dataImg[i * 4 + 2] = 255;
+                                dataImg[i * 4 + 3] = 255;
+                                continue;
+                            }
+                        */
+
+                        // 区域选择
+                        if (roiVertex.Count > 0)
                         {
-                            dataImg[i * 4] = colorPixels[(x + y * colorWidth) * 4];
-                            dataImg[i * 4 + 1] = colorPixels[(x + y * colorWidth) * 4 + 1];
-                            dataImg[i * 4 + 2] = colorPixels[(x + y * colorWidth) * 4 + 2];
-                            dataImg[i * 4 + 3] = colorPixels[(x + y * colorWidth) * 4 + 3];
+                            if (Algorithm.IsInPolygonF(new System.Drawing.PointF(x, y), roi))
+                            {
+                                dataImg[i * 4] = colorPixels[(x + y * colorWidth) * 4];
+                                dataImg[i * 4 + 1] = colorPixels[(x + y * colorWidth) * 4 + 1];
+                                dataImg[i * 4 + 2] = colorPixels[(x + y * colorWidth) * 4 + 2];
+                                dataImg[i * 4 + 3] = colorPixels[(x + y * colorWidth) * 4 + 3];
+                            }
+                            else
+                            {
+                                udepth[i] = 0;
+                                dataImg[i * 4] = 255;
+                                dataImg[i * 4 + 1] = 255;
+                                dataImg[i * 4 + 2] = 255;
+                                dataImg[i * 4 + 3] = 255;
+                            }
                         }
                         else
                         {
-                            udepth[i] = 0;
-                            dataImg[i * 4] = 255;
-                            dataImg[i * 4 + 1] = 255;
-                            dataImg[i * 4 + 2] = 255;
-                            dataImg[i * 4 + 3] = 255;
+                                dataImg[i * 4] = colorPixels[(x + y * colorWidth) * 4];
+                                dataImg[i * 4 + 1] = colorPixels[(x + y * colorWidth) * 4 + 1];
+                                dataImg[i * 4 + 2] = colorPixels[(x + y * colorWidth) * 4 + 2];
+                                dataImg[i * 4 + 3] = colorPixels[(x + y * colorWidth) * 4 + 3];
                         }
-                        continue;
+                        colorRecords[(x + y * colorWidth) * 4] = true;
                     }
-
-                    if (x < 0 || x >= colorWidth ||
-                        y < 0 || y >= colorHeight)
-                    {
+                    else {
                         udepth[i] = 0;
                         dataImg[i * 4] = 255;
                         dataImg[i * 4 + 1] = 255;
                         dataImg[i * 4 + 2] = 255;
                         dataImg[i * 4 + 3] = 255;
-                        continue;
-                    }
-                    else
-                    {
-                        dataImg[i * 4] = colorPixels[(x + y * colorWidth)*4];
-                        dataImg[i * 4 + 1] = colorPixels[(x + y * colorWidth)*4 + 1];
-                        dataImg[i * 4 + 2] = colorPixels[(x + y * colorWidth)*4 + 2];
-                        dataImg[i * 4 + 3] = colorPixels[(x + y * colorWidth)*4 + 3];
-                        continue;
                     }
                 }
                 Marshal.Copy(dataImg, 0, ptrSrc, dataImg.Length);
@@ -366,7 +390,7 @@ namespace sift
             Image<Gray, Byte> sourecImage = BitmapExtensions.ToGrayImage(imgShows[0].getOriginBitmap());
             Image<Gray, Byte> targetImage = BitmapExtensions.ToGrayImage(imgShows[1].getOriginBitmap());
             List<MatchPointResult> matchPointResults;
-            MatchingAlgorithm.PointCloudMatch(imgShows[0].filterPointCloud3d, sourecImage, targetImage, out matchPointResults, subsetSize, range, limitR);
+            MatchingAlgorithm.PointCloudMatch(imgShows[0].filterPointCloud3d, sourecImage, targetImage, out matchPointResults, subsetSize, dicSearchRange, limitR);
 
             List<PointCloud3D> pointCloud3Ds1 = new List<PointCloud3D>();
             List<PointCloud3D> pointCloud3Ds2 = new List<PointCloud3D>();
@@ -380,7 +404,7 @@ namespace sift
 
                 double pic2_x = matchPointResults[i].match_X;
                 double pic2_y = matchPointResults[i].match_Y;
-                double pic2_z = imgShows[1].getDepthPixelByPicXY(pic1_x, pic1_y);
+                double pic2_z = imgShows[1].getDepthPixelByPicXY(pic2_x, pic2_y);
                 double z2_mm = imgShows[1].getDepthByPicXY(pic2_x, pic2_y);
                 double x2_mm, y2_mm;
                 imgShows[1].calculateWorldXY(pic2_x, pic2_y, z2_mm, out x2_mm, out y2_mm);
@@ -391,25 +415,22 @@ namespace sift
                 pointCloud3Ds2.Add(new PointCloud3D(x2_mm, y2_mm, z2_mm, pic2_x, pic2_y, pic2_z));
             }
 
-            double[,] r;
-            double[] t;
-            SvdRT.RegisterPointCloud(pointCloud3Ds2, pointCloud3Ds1, out r, out t);
-            MathNet.Numerics.LinearAlgebra.Matrix<double> mr;
-            Vector<double> vt;
-            ICP.iteration(pointCloud3Ds2, pointCloud3Ds1, out mr, out vt);
-            List<PointCloud3D> pointCloud3Ds2to1 = ICP.transformListPointClouds(pointCloud3Ds2, mr, vt);
-            foreach (PointCloud3D item in pointCloud3Ds2to1)
-            {
-                double z_mm = imgShows[0].getDepthByPicXY(item.Pic_X, item.Pic_Y);
-                double x_mm, y_mm;
-                imgShows[0].calculateWorldXY(item.Pic_X, item.Pic_Y, z_mm, out x_mm, out y_mm);
-                item.X = x_mm;
-                item.Y = y_mm;
-                item.Z = z_mm;
-            }
-            _3DShow dShow = new _3DShow(pointCloud3Ds1, null, pointCloud3Ds2to1, null);
-            dShow.Show();
-            
+            SvdRT.RegisterPointCloud(pointCloud3Ds2, pointCloud3Ds1, out MathNet.Numerics.LinearAlgebra.Matrix<double> mr, out Vector<double> vt);
+            List<PointCloud3D> pointCloud3Ds2to1_a = ICP.transformListPointClouds(pointCloud3Ds2, mr, vt);
+            ICP.iteration(pointCloud3Ds2, pointCloud3Ds1, out MathNet.Numerics.LinearAlgebra.Matrix<double> mrs, out Vector<double> vts);
+            List<PointCloud3D> pointCloud3Ds2to1_b = ICP.transformListPointClouds(pointCloud3Ds2, mrs, vts);
+            /*            foreach (PointCloud3D item in pointCloud3Ds2to1)
+                        {
+                            double z_mm = imgShows[0].getDepthByPicXY(item.Pic_X, item.Pic_Y);
+                            double x_mm, y_mm;
+                            imgShows[0].calculateWorldXY(item.Pic_X, item.Pic_Y, z_mm, out x_mm, out y_mm);
+                            item.X = x_mm;
+                            item.Y = y_mm;
+                            item.Z = z_mm;
+                        }
+                        _3DShow dShow = new _3DShow(pointCloud3Ds1, null, pointCloud3Ds2to1, null);
+                        dShow.Show();*/
+            int a = 0;
         }
 
         private void ShowMatchResultBtn_Click(object sender, EventArgs e)
@@ -426,13 +447,36 @@ namespace sift
             }
 
             List<List<MatchPointResult>> matchPointResultss = new List<List<MatchPointResult>>();
+            List<PointCloud3D> matchPointCloud3Ds = imgShows[0].filterPointCloud3d;
             for (int i = 0; i < imgShows.Count - 1; i++)
             {
                 Image<Gray, Byte> sourecImage = BitmapExtensions.ToGrayImage(imgShows[i].getOriginBitmap());
                 Image<Gray, Byte> targetImage = BitmapExtensions.ToGrayImage(imgShows[i + 1].getOriginBitmap());
                 List<MatchPointResult> matchPointResults;
-                MatchingAlgorithm.PointCloudMatch(imgShows[i].filterPointCloud3d, sourecImage, targetImage, out matchPointResults, subsetSize, range, limitR);
+                MatchingAlgorithm.PointCloudMatch(matchPointCloud3Ds, sourecImage, targetImage, out matchPointResults, subsetSize, dicSearchRange, limitR);
+                List<PointCloud3D> pointCloud3Ds1 = new List<PointCloud3D>();
+                List<PointCloud3D> pointCloud3Ds2 = new List<PointCloud3D>();
+                for (int pi = 0; pi < matchPointResults.Count; pi++)
+                {
+                    double pic1_x = matchPointResults[pi].X;
+                    double pic1_y = matchPointResults[pi].Y;
+                    double pic1_z = imgShows[i].getDepthPixelByPicXY(pic1_x, pic1_y);
+                    double z1_mm = imgShows[i].getDepthByPicXY(pic1_x, pic1_y);
+                    double x1_mm, y1_mm;
+                    imgShows[i].calculateWorldXY(pic1_x, pic1_y, z1_mm, out x1_mm, out y1_mm);
+                    double pic2_x = matchPointResults[pi].match_X;
+                    double pic2_y = matchPointResults[pi].match_Y;
+                    double pic2_z = imgShows[i + 1].getDepthPixelByPicXY(pic1_x, pic1_y);
+                    double z2_mm = imgShows[i + 1].getDepthByPicXY(pic2_x, pic2_y);
+                    double x2_mm, y2_mm;
+                    imgShows[i + 1].calculateWorldXY(pic2_x, pic2_y, z2_mm, out x2_mm, out y2_mm);
+                    if (z1_mm == 0 || z2_mm == 0)
+                        continue;
+                    pointCloud3Ds1.Add(new PointCloud3D(x1_mm, y1_mm, z1_mm, pic1_x, pic1_y, pic1_z));
+                    pointCloud3Ds2.Add(new PointCloud3D(x2_mm, y2_mm, z2_mm, pic2_x, pic2_y, pic2_z));
+                }
                 matchPointResultss.Add(matchPointResults);
+                matchPointCloud3Ds = pointCloud3Ds2;
             }
             MatchPointShow matchPointShow = new MatchPointShow(bitmaps.ToArray(), matchPointResultss);
             matchPointShow.Show();
@@ -465,5 +509,86 @@ namespace sift
 
         }
 
+        // 计算RT 计算重投影误差 进行融合
+        private void plyFileOutputBtn_Click(object sender, EventArgs e)
+        {
+            List<PointCloud3D> matchPoint3Ds = imgShows[0].filterPointCloud3d;
+            List<List<PointCloud3D>> result3DLists = new List<List<PointCloud3D>>();
+            List<PointCloud3D> result3Ds = new List<PointCloud3D>();
+            result3DLists.Add(matchPoint3Ds);
+            result3Ds.AddRange(matchPoint3Ds);
+
+            //1.计算RT
+            List<List<MatchPointResult>> matchPointResultss = new List<List<MatchPointResult>>();
+            List<MathNet.Numerics.LinearAlgebra.Matrix<double>> matchRs = new List<MathNet.Numerics.LinearAlgebra.Matrix<double>>();
+            List<MathNet.Numerics.LinearAlgebra.Vector<double>> matchTs = new List<MathNet.Numerics.LinearAlgebra.Vector<double>>();
+            for (int i = 0; i < imgShows.Count - 1; i++)
+            {
+                Image<Gray, Byte> sourecImage = BitmapExtensions.ToGrayImage(imgShows[i].getOriginBitmap());
+                Image<Gray, Byte> targetImage = BitmapExtensions.ToGrayImage(imgShows[i + 1].getOriginBitmap());
+                List<MatchPointResult> matchPointResults;
+                MatchingAlgorithm.PointCloudMatch(matchPoint3Ds, sourecImage, targetImage, out matchPointResults, subsetSize, dicSearchRange, limitR);
+                matchPointResultss.Add(matchPointResults);
+
+                List<PointCloud3D> pointCloud3Ds1 = new List<PointCloud3D>();
+                List<PointCloud3D> pointCloud3Ds2 = new List<PointCloud3D>();
+                for (int pi = 0; pi < matchPointResults.Count; pi++)
+                {
+                    double pic1_x = matchPointResults[pi].X;
+                    double pic1_y = matchPointResults[pi].Y;
+                    double pic1_z = imgShows[i].getDepthPixelByPicXY(pic1_x, pic1_y);
+                    double z1_mm = imgShows[i].getDepthByPicXY(pic1_x, pic1_y);
+                    double x1_mm, y1_mm;
+                    imgShows[i].calculateWorldXY(pic1_x, pic1_y, z1_mm, out x1_mm, out y1_mm);
+
+                    double pic2_x = matchPointResults[pi].match_X;
+                    double pic2_y = matchPointResults[pi].match_Y;
+                    double pic2_z = imgShows[i + 1].getDepthPixelByPicXY(pic1_x, pic1_y);
+                    double z2_mm = imgShows[i + 1].getDepthByPicXY(pic2_x, pic2_y);
+                    double x2_mm, y2_mm;
+                    imgShows[i + 1].calculateWorldXY(pic2_x, pic2_y, z2_mm, out x2_mm, out y2_mm);
+
+                    if (z1_mm == 0 || z2_mm == 0)
+                        continue;
+                    pointCloud3Ds1.Add(new PointCloud3D(x1_mm, y1_mm, z1_mm, pic1_x, pic1_y, pic1_z));
+                    pointCloud3Ds2.Add(new PointCloud3D(x2_mm, y2_mm, z2_mm, pic2_x, pic2_y, pic2_z));
+                }
+                MathNet.Numerics.LinearAlgebra.Matrix<double> r;
+                MathNet.Numerics.LinearAlgebra.Vector<double> t;
+                SvdRT.RegisterPointCloud(pointCloud3Ds2, pointCloud3Ds1, out r, out t);
+                ICP.iteration(imgShows[i].filterPointCloud3d, imgShows[i+1].filterPointCloud3d, r, t, out MathNet.Numerics.LinearAlgebra.Matrix<double> mr, out MathNet.Numerics.LinearAlgebra.Vector<double> vt);
+                matchRs.Add(mr);
+                matchTs.Add(vt);
+                // 把前一张的变形图当后一张参考图
+                matchPoint3Ds = pointCloud3Ds2;
+            }
+
+            //2.重投影到第一幅图片
+            for (int i = 0; i < matchRs.Count; i++) {
+                List<MathNet.Numerics.LinearAlgebra.Matrix<double>> R = matchRs.GetRange(0, i + 1);
+                List<MathNet.Numerics.LinearAlgebra.Vector<double>> T = matchTs.GetRange(0, i + 1);
+                List<PointCloud3D> pointCloud3Dsto1 = ICP.transformListPointClouds(imgShows[i + 1].filterPointCloud3d, R, T);
+
+                result3DLists.Add(pointCloud3Dsto1);
+                result3Ds.AddRange(pointCloud3Dsto1);
+            }
+
+/*            // 通过可变圆模板重新匹配
+            Bitmap Img_0 = imgShows[0].getOriginBitmap();
+            List<List<MatchPointResult>> vms = new List<List<MatchPointResult>>();
+            for (int i = 0; i < imgShows.Count - 1; i++)
+            {
+                Bitmap targetImage = imgShows[i + 1].getOriginBitmap();
+                List<MathNet.Numerics.LinearAlgebra.Matrix<double>> R = matchRs.GetRange(0, i + 1);
+                List<MatchPointResult> vm = MatchingAlgorithm.VariableCircleTemplateMatching(Img_0, targetImage, R, imgShows[0].filterPointCloud3d,
+                    10, dicSearchRange, limitR, matchPointResultss[0]);
+                vms.Add(vm);
+            }*/
+
+            //输出点云
+            KdTree kdTree = new KdTree(result3Ds);
+            PointFetures.getNormals(kdTree, result3Ds, 10);
+            PLY.writePlyFile("kinectFusionPly.ply", result3Ds);
+        }
     }
 }

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Factorization;
-
+using sift.common;
 
 /**
  * 需要Nuget下载MathNet包
@@ -16,11 +16,47 @@ namespace sift.PointCloudHandler
     public class SvdRT
     {
         public static void RegisterPointCloud(List<PointCloud3D> sourceClouds, List<PointCloud3D> targetClouds,
+           out Matrix<double> rotation, out Vector<double> translation)
+        {
+            // 生成用于运算的点云
+            Matrix<double> sourceCloud = GeneratePointCloudByWorldPosition(sourceClouds);
+            Matrix<double> targetCloud = GeneratePointCloudByWorldPosition(targetClouds);
+
+            // 计算中心点
+            Vector<double> sourceCentroid = CalculateCentroid(sourceCloud);
+            Vector<double> targetCentroid = CalculateCentroid(targetCloud);
+
+            // 每个点云点与中心点做差
+            Matrix<double> centeredSourceCloud = CenterPointCloud(sourceCloud, sourceCentroid);
+            Matrix<double> centeredTargetCloud = CenterPointCloud(targetCloud, targetCentroid);
+
+            // 计算协方差矩阵
+            Matrix<double> crossCovariance = CalculateCrossCovariance(centeredSourceCloud, centeredTargetCloud);
+
+            // SVD
+            Svd<double> svd = crossCovariance.Svd();
+
+            // 旋转矩阵
+            Matrix<double> rotationMatrix = svd.VT.Transpose() * svd.U.Transpose();
+
+            // 平移矩阵
+            Vector<double> translationVector = targetCentroid - rotationMatrix * sourceCentroid;
+
+            // Print out results
+            Console.WriteLine("Rotation Matrix:");
+            Console.WriteLine(rotationMatrix);
+            Console.WriteLine("Translation Vector:");
+            Console.WriteLine(translationVector);
+            rotation = rotationMatrix;
+            translation = translationVector;
+        }
+
+        public static void RegisterPointCloud(List<PointCloud3D> sourceClouds, List<PointCloud3D> targetClouds,
             out double[,] rotation, out double[] translation)
         {
             // 生成用于运算的点云
-            Matrix<double> sourceCloud = GeneratePointCloudByPicPosition(sourceClouds);
-            Matrix<double> targetCloud = GeneratePointCloudByPicPosition(targetClouds);
+            Matrix<double> sourceCloud = GeneratePointCloudByWorldPosition(sourceClouds);
+            Matrix<double> targetCloud = GeneratePointCloudByWorldPosition(targetClouds);
 
             // 计算中心点
             Vector<double> sourceCentroid = CalculateCentroid(sourceCloud);
@@ -170,7 +206,7 @@ namespace sift.PointCloudHandler
             double[,] n = new double[1, 3];
 
             // 生成用于运算的点云
-            Matrix<double> nearPoints = GeneratePointCloudByPicPosition(nearPointCloud3Ds);
+            Matrix<double> nearPoints = GeneratePointCloudByWorldPosition(nearPointCloud3Ds);
 
             // 计算中心点
             Vector<double> centroid = CalculateCentroid(nearPoints);
@@ -190,6 +226,10 @@ namespace sift.PointCloudHandler
             nsc[0] = pointCloud.X - centroid[0];
             nsc[1] = pointCloud.Y - centroid[1];
             nsc[2] = pointCloud.Z - centroid[2];
+            /*            nsc[0] = -pointCloud.X;
+                        nsc[1] = -pointCloud.Y;
+                        nsc[2] = -pointCloud.Z;*/
+            nsc = nsc.Normalize(1);
             double angle = Math.Round(ns.DotProduct(nsc), 6);
             if (angle < 0) {
                 ns = -ns;
@@ -204,24 +244,34 @@ namespace sift.PointCloudHandler
             List<PointCloud3D> spointCloud3Ds = new List<PointCloud3D>();
             List<PointCloud3D> tpointCloud3Ds = new List<PointCloud3D>();
 
-            spointCloud3Ds.Add(new PointCloud3D(1, 1, 1));
-            spointCloud3Ds.Add(new PointCloud3D(2, 2, 1));
-            spointCloud3Ds.Add(new PointCloud3D(3, 3, 1));
-            spointCloud3Ds.Add(new PointCloud3D(4, 3, 1));
-            spointCloud3Ds.Add(new PointCloud3D(5, 3, 1));
-            spointCloud3Ds.Add(new PointCloud3D(6, 3, 1));
+            spointCloud3Ds.Add(new PointCloud3D(0, 0, 0));
+            spointCloud3Ds.Add(new PointCloud3D(1, 0, 0));
+            spointCloud3Ds.Add(new PointCloud3D(1, 1, 0));
+            spointCloud3Ds.Add(new PointCloud3D(0, 1, 0));
+            /*            spointCloud3Ds.Add(new PointCloud3D(0, 0, 1));
+                        spointCloud3Ds.Add(new PointCloud3D(1, 0, 1));
+                        spointCloud3Ds.Add(new PointCloud3D(1, 1, 1));
+                        spointCloud3Ds.Add(new PointCloud3D(0, 1, 1));*/
 
+            tpointCloud3Ds.Add(new PointCloud3D(1, 0, 0));
+            tpointCloud3Ds.Add(new PointCloud3D(2, 0, 0));
+            tpointCloud3Ds.Add(new PointCloud3D(2, 1, 0));
+            tpointCloud3Ds.Add(new PointCloud3D(1, 1, 0));
+/*
+            tpointCloud3Ds.Add(new PointCloud3D(1, 0, 1));
             tpointCloud3Ds.Add(new PointCloud3D(1, 1, 1));
-            tpointCloud3Ds.Add(new PointCloud3D(2, 2, 1));
-            tpointCloud3Ds.Add(new PointCloud3D(3, 3, 1));
-            tpointCloud3Ds.Add(new PointCloud3D(4, 3, 1));
-            tpointCloud3Ds.Add(new PointCloud3D(5, 3, 1));
-            tpointCloud3Ds.Add(new PointCloud3D(66, 3, 1));
+            tpointCloud3Ds.Add(new PointCloud3D(0, 1, 1));
+            tpointCloud3Ds.Add(new PointCloud3D(0, 0, 1));*/
 
-            double[,] r;
-            double[] t;
+            Matrix<double> r;
+            Vector<double> t;
 
             RegisterPointCloud(spointCloud3Ds, tpointCloud3Ds, out r, out t);
+
+            Vector<double> eular = Algorithm.MatrixToEuler(r);
+            Matrix<double> mr = Algorithm.EulerToMatrix(eular);
+
+            List<PointCloud3D> pointCloud3Dto1 = ICP.transformListPointClouds(spointCloud3Ds, r, t);
             int a = 0;
         }
 

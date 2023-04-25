@@ -3,9 +3,11 @@ using Emgu.CV;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Drawing;
+using System.Diagnostics;
+using System.Security.Cryptography;
+using MathNet.Numerics.Integration;
+using MathNet.Numerics.LinearAlgebra.Complex;
 
 namespace sift.common
 {
@@ -50,6 +52,19 @@ namespace sift.common
             double rr = y - row;
             double cc = x - col;
 
+            if (row + 1 >= image.Height && col + 1 >= image.Width) {
+                return image.Data[row, col, 0];
+            }
+            if (row + 1 >= image.Height)
+            {
+                return (1 - cc) * image.Data[row, col, 0] +
+                       cc * image.Data[row, col + 1, 0];
+            }
+            if (col + 1 >= image.Width) {
+                return (1 - rr) * image.Data[row, col, 0] +
+                       rr * image.Data[row + 1, col, 0];
+            }
+
             return (1 - rr) * (1 - cc) * image.Data[row, col, 0] +
                    (1 - rr) * cc * image.Data[row, col + 1, 0] +
                    rr * (1 - cc) * image.Data[row + 1, col, 0] +
@@ -63,6 +78,21 @@ namespace sift.common
 
             double rr = y - row;
             double cc = x - col;
+
+            if (row + 1 >= image.Height && col + 1 >= image.Width)
+            {
+                return image.Data[row, col, 0];
+            }
+            if (row + 1 >= image.Height)
+            {
+                return (1 - cc) * image.Data[row, col, 0] +
+                       cc * image.Data[row, col + 1, 0];
+            }
+            if (col + 1 >= image.Width)
+            {
+                return (1 - rr) * image.Data[row, col, 0] +
+                       rr * image.Data[row + 1, col, 0];
+            }
 
             return (1 - rr) * (1 - cc) * image.Data[row, col, 0] +
                    (1 - rr) * cc * image.Data[row, col + 1, 0] +
@@ -78,6 +108,21 @@ namespace sift.common
             double rr = y - row;
             double cc = x - col;
 
+            if (row + 1 >= image.Height && col + 1 >= image.Width)
+            {
+                return image.Data[row, col, 0];
+            }
+            if (row + 1 >= image.Height)
+            {
+                return (1 - cc) * image.Data[row, col, 0] +
+                       cc * image.Data[row, col + 1, 0];
+            }
+            if (col + 1 >= image.Width)
+            {
+                return (1 - rr) * image.Data[row, col, 0] +
+                       rr * image.Data[row + 1, col, 0];
+            }
+
             return (1 - rr) * (1 - cc) * image.Data[row, col, 0] +
                    (1 - rr) * cc * image.Data[row, col + 1, 0] +
                    rr * (1 - cc) * image.Data[row + 1, col, 0] +
@@ -91,7 +136,22 @@ namespace sift.common
 
             double rr = y - row;
             double cc = x - col;
-            
+
+            if (row + 1 >= height && col + 1 >= width)
+            {
+                return data[row * width + col];
+            }
+            if (row + 1 >= height)
+            {
+                return (1 - cc) * data[row * width + col] +
+                        cc * data[row * width + col + 1];
+            }
+            if (col + 1 >= width)
+            {
+                return (1 - rr) * data[row * width + col] +
+                       rr * data[(row + 1) * width + col];
+            }
+
             return (1 - rr) * (1 - cc) * data[row * width + col] +
                    (1 - rr) * cc * data[row * width + col + 1] +
                    rr * (1 - cc) * data[(row + 1)* width + col] +
@@ -105,6 +165,21 @@ namespace sift.common
 
             double rr = y - row;
             double cc = x - col;
+
+            if (row + 1 >= height && col + 1 >= width)
+            {
+                return data[row * width + col];
+            }
+            if (row + 1 >= height)
+            {
+                return (1 - cc) * data[row * width + col] +
+                        cc * data[row * width + col + 1];
+            }
+            if (col + 1 >= width)
+            {
+                return (1 - rr) * data[row * width + col] +
+                       rr * data[(row + 1) * width + col];
+            }
 
             return (1 - rr) * (1 - cc) * data[row * width + col] +
                    (1 - rr) * cc * data[row * width + col + 1] +
@@ -179,5 +254,63 @@ namespace sift.common
             }
             return inside;
         }
+
+        // 转弧度
+        public static double ToRadians(double degrees)
+        {
+            return degrees * (double)Math.PI / 180.0f;
+        }
+        // 转角度
+        public static double ToDegrees(double radians)
+        {
+            return radians * 180.0f / (double)Math.PI;
+        }
+
+        // 欧拉角转为旋转矩阵
+        public static MathNet.Numerics.LinearAlgebra.Matrix<double> EulerToMatrix(MathNet.Numerics.LinearAlgebra.Vector<double> Euler_xyz)
+        {
+            MathNet.Numerics.LinearAlgebra.Matrix<double> Rmatrix = MathNet.Numerics.LinearAlgebra.Matrix<double>.Build.Dense(3, 3);
+            MathNet.Numerics.LinearAlgebra.Matrix<double> Rz = MathNet.Numerics.LinearAlgebra.Matrix<double>.Build.DenseOfArray(
+                new double[,] { 
+                    { Math.Cos(Euler_xyz[2]), -Math.Sin(Euler_xyz[2]), 0 }, 
+                    { Math.Sin(Euler_xyz[2]), Math.Cos(Euler_xyz[2]), 0 },
+                    { 0, 0, 1} 
+                });
+            MathNet.Numerics.LinearAlgebra.Matrix<double> Ry = MathNet.Numerics.LinearAlgebra.Matrix<double>.Build.DenseOfArray(
+                new double[,] { 
+                    { Math.Cos(Euler_xyz[1]), 0 , Math.Sin(Euler_xyz[1])},
+                    { 0, 1, 0},
+                    { -Math.Sin(Euler_xyz[1]), 0 , Math.Cos(Euler_xyz[1])} 
+                });
+            MathNet.Numerics.LinearAlgebra.Matrix<double> Rx = MathNet.Numerics.LinearAlgebra.Matrix<double>.Build.DenseOfArray(
+                new double[,] {
+                    { 1, 0, 0},
+                    { 0 , Math.Cos(Euler_xyz[0]),- Math.Sin(Euler_xyz[0])},
+                    { 0 , Math.Sin(Euler_xyz[0]), Math.Cos(Euler_xyz[0])}
+                });
+
+            Rmatrix = Rz * Ry * Rz;
+            return Rmatrix;
+        }
+        // 旋转矩阵转为欧拉角
+        public static MathNet.Numerics.LinearAlgebra.Vector<double> MatrixToEuler(MathNet.Numerics.LinearAlgebra.Matrix<double> R)
+        {
+            double x,y,z;
+            double sy = Math.Sqrt(R[0, 0] * R[0, 0] + R[1, 0] * R[1, 0]);
+            bool singular = sy < 1e-6;
+            if (!singular) {
+                x = Math.Atan2(R[2, 1], R[2, 2]);
+                y = Math.Atan2(-R[2, 0], sy);
+                z = Math.Atan2(R[1, 0], R[0, 0]);
+
+            } else {
+                x = Math.Atan2(-R[1, 2], R[1, 1]);
+                y = Math.Atan2(-R[2, 0], sy);
+                z = 0;
+            }
+            return MathNet.Numerics.LinearAlgebra.Vector<double>.Build.DenseOfArray(new double[3] { x, y, z });
+        }
+
+
     }
 }

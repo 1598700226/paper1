@@ -35,13 +35,20 @@
             this.operateBtn = new System.Windows.Forms.ToolStripDropDownButton();
             this.savePicBtn = new System.Windows.Forms.ToolStripMenuItem();
             this.rollBackBtn = new System.Windows.Forms.ToolStripMenuItem();
+            this.rollBackOriBpmBtn = new System.Windows.Forms.ToolStripMenuItem();
+            this.btnPlyFile = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
             this.btnRgbD = new System.Windows.Forms.ToolStripMenuItem();
             this.downSamplingBtn = new System.Windows.Forms.ToolStripMenuItem();
             this.剔除离群点ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.btnOutliers = new System.Windows.Forms.ToolStripMenuItem();
+            this.DirectFilteringBtn = new System.Windows.Forms.ToolStripMenuItem();
+            this.removeGround = new System.Windows.Forms.ToolStripMenuItem();
+            this.迭代次数ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.GroundFilteringIteration = new System.Windows.Forms.ToolStripTextBox();
+            this.GroundFilteringError = new System.Windows.Forms.ToolStripTextBox();
+            this.removeGroundBtn = new System.Windows.Forms.ToolStripMenuItem();
             this.calFpfh = new System.Windows.Forms.ToolStripMenuItem();
-            this.btnPlyFile = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.picBox)).BeginInit();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -83,6 +90,7 @@
             this.operateBtn.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.savePicBtn,
             this.rollBackBtn,
+            this.rollBackOriBpmBtn,
             this.btnPlyFile});
             this.operateBtn.Image = ((System.Drawing.Image)(resources.GetObject("operateBtn.Image")));
             this.operateBtn.ImageTransparentColor = System.Drawing.Color.Magenta;
@@ -94,16 +102,30 @@
             // savePicBtn
             // 
             this.savePicBtn.Name = "savePicBtn";
-            this.savePicBtn.Size = new System.Drawing.Size(270, 34);
+            this.savePicBtn.Size = new System.Drawing.Size(218, 34);
             this.savePicBtn.Text = "保存图片";
             this.savePicBtn.Click += new System.EventHandler(this.savePicBtn_Click);
             // 
             // rollBackBtn
             // 
             this.rollBackBtn.Name = "rollBackBtn";
-            this.rollBackBtn.Size = new System.Drawing.Size(270, 34);
+            this.rollBackBtn.Size = new System.Drawing.Size(218, 34);
             this.rollBackBtn.Text = "还原";
-            this.rollBackBtn.Click += new System.EventHandler(this.rollBackBtn_Click);
+            this.rollBackBtn.Click += new System.EventHandler(this.rollBackBtn_Click_1);
+            // 
+            // rollBackOriBpmBtn
+            // 
+            this.rollBackOriBpmBtn.Name = "rollBackOriBpmBtn";
+            this.rollBackOriBpmBtn.Size = new System.Drawing.Size(218, 34);
+            this.rollBackOriBpmBtn.Text = "还原原始图片";
+            this.rollBackOriBpmBtn.Click += new System.EventHandler(this.rollBackBtn_Click);
+            // 
+            // btnPlyFile
+            // 
+            this.btnPlyFile.Name = "btnPlyFile";
+            this.btnPlyFile.Size = new System.Drawing.Size(218, 34);
+            this.btnPlyFile.Text = "输出ply文件";
+            this.btnPlyFile.Click += new System.EventHandler(this.btnPlyFile_Click);
             // 
             // toolStripDropDownButton1
             // 
@@ -119,45 +141,87 @@
             // btnRgbD
             // 
             this.btnRgbD.Name = "btnRgbD";
-            this.btnRgbD.Size = new System.Drawing.Size(236, 34);
+            this.btnRgbD.Size = new System.Drawing.Size(270, 34);
             this.btnRgbD.Text = "融合色彩和深度";
             this.btnRgbD.Click += new System.EventHandler(this.btnRgbD_Click);
             // 
             // downSamplingBtn
             // 
             this.downSamplingBtn.Name = "downSamplingBtn";
-            this.downSamplingBtn.Size = new System.Drawing.Size(236, 34);
+            this.downSamplingBtn.Size = new System.Drawing.Size(270, 34);
             this.downSamplingBtn.Text = "均匀降采样";
             this.downSamplingBtn.Click += new System.EventHandler(this.downSamplingBtn_Click);
             // 
             // 剔除离群点ToolStripMenuItem
             // 
             this.剔除离群点ToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.btnOutliers});
+            this.btnOutliers,
+            this.DirectFilteringBtn,
+            this.removeGround});
             this.剔除离群点ToolStripMenuItem.Name = "剔除离群点ToolStripMenuItem";
-            this.剔除离群点ToolStripMenuItem.Size = new System.Drawing.Size(236, 34);
+            this.剔除离群点ToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
             this.剔除离群点ToolStripMenuItem.Text = "剔除离群点";
             // 
             // btnOutliers
             // 
             this.btnOutliers.Name = "btnOutliers";
-            this.btnOutliers.Size = new System.Drawing.Size(218, 34);
+            this.btnOutliers.Size = new System.Drawing.Size(270, 34);
             this.btnOutliers.Text = "基于统计方法";
             this.btnOutliers.Click += new System.EventHandler(this.btnOutliers_Click);
+            // 
+            // DirectFilteringBtn
+            // 
+            this.DirectFilteringBtn.Name = "DirectFilteringBtn";
+            this.DirectFilteringBtn.Size = new System.Drawing.Size(270, 34);
+            this.DirectFilteringBtn.Text = "基于直通滤波方法";
+            this.DirectFilteringBtn.Click += new System.EventHandler(this.DirectFilteringBtn_Click);
+            // 
+            // removeGround
+            // 
+            this.removeGround.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.迭代次数ToolStripMenuItem,
+            this.removeGroundBtn});
+            this.removeGround.Name = "removeGround";
+            this.removeGround.Size = new System.Drawing.Size(270, 34);
+            this.removeGround.Text = "剔除地面";
+            this.removeGround.Click += new System.EventHandler(this.removeGround_Click);
+            // 
+            // 迭代次数ToolStripMenuItem
+            // 
+            this.迭代次数ToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.GroundFilteringIteration,
+            this.GroundFilteringError});
+            this.迭代次数ToolStripMenuItem.Name = "迭代次数ToolStripMenuItem";
+            this.迭代次数ToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
+            this.迭代次数ToolStripMenuItem.Text = "参数设置";
+            // 
+            // GroundFilteringIteration
+            // 
+            this.GroundFilteringIteration.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F);
+            this.GroundFilteringIteration.Name = "GroundFilteringIteration";
+            this.GroundFilteringIteration.Size = new System.Drawing.Size(270, 30);
+            this.GroundFilteringIteration.Text = "1000";
+            // 
+            // GroundFilteringError
+            // 
+            this.GroundFilteringError.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F);
+            this.GroundFilteringError.Name = "GroundFilteringError";
+            this.GroundFilteringError.Size = new System.Drawing.Size(360, 30);
+            this.GroundFilteringError.Text = "40";
+            // 
+            // removeGroundBtn
+            // 
+            this.removeGroundBtn.Name = "removeGroundBtn";
+            this.removeGroundBtn.Size = new System.Drawing.Size(270, 34);
+            this.removeGroundBtn.Text = "剔除";
+            this.removeGroundBtn.Click += new System.EventHandler(this.removeGroundBtn_Click);
             // 
             // calFpfh
             // 
             this.calFpfh.Name = "calFpfh";
-            this.calFpfh.Size = new System.Drawing.Size(236, 34);
+            this.calFpfh.Size = new System.Drawing.Size(270, 34);
             this.calFpfh.Text = "计算fpfh值";
             this.calFpfh.Click += new System.EventHandler(this.calFpfh_Click);
-            // 
-            // btnPlyFile
-            // 
-            this.btnPlyFile.Name = "btnPlyFile";
-            this.btnPlyFile.Size = new System.Drawing.Size(270, 34);
-            this.btnPlyFile.Text = "输出ply文件";
-            this.btnPlyFile.Click += new System.EventHandler(this.btnPlyFile_Click);
             // 
             // ImgShow
             // 
@@ -190,11 +254,18 @@
         private System.Windows.Forms.ToolStripMenuItem savePicBtn;
         private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButton1;
         private System.Windows.Forms.ToolStripMenuItem downSamplingBtn;
-        private System.Windows.Forms.ToolStripMenuItem rollBackBtn;
+        private System.Windows.Forms.ToolStripMenuItem rollBackOriBpmBtn;
         private System.Windows.Forms.ToolStripMenuItem calFpfh;
         private System.Windows.Forms.ToolStripMenuItem 剔除离群点ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem btnOutliers;
         private System.Windows.Forms.ToolStripMenuItem btnRgbD;
         private System.Windows.Forms.ToolStripMenuItem btnPlyFile;
+        private System.Windows.Forms.ToolStripMenuItem DirectFilteringBtn;
+        private System.Windows.Forms.ToolStripMenuItem removeGround;
+        private System.Windows.Forms.ToolStripMenuItem 迭代次数ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripTextBox GroundFilteringIteration;
+        private System.Windows.Forms.ToolStripTextBox GroundFilteringError;
+        private System.Windows.Forms.ToolStripMenuItem removeGroundBtn;
+        private System.Windows.Forms.ToolStripMenuItem rollBackBtn;
     }
 }

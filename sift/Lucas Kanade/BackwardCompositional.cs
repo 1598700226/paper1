@@ -38,12 +38,9 @@ namespace sift.Lucas_Kanade
 
             // 获取参考模板和x\y梯度
             Rectangle rectTemp = new Rectangle(tx, ty, tempWidth, tempHeight);
-            Image<Gray, byte> imageRefTemp = new Image<Gray, byte>(rectTemp.Size);
-            imageRefTemp = imgRef.Copy(rectTemp);
-            Image<Gray, double> imageRefTemp_gx = new Image<Gray, double>(rectTemp.Size);
-            imageRefTemp_gx = imgRefGradientx.Copy(rectTemp);
-            Image<Gray, double> imageRefTemp_gy = new Image<Gray, double>(rectTemp.Size);
-            imageRefTemp_gy = imgRefGradienty.Copy(rectTemp);
+            Image<Gray, byte> imageRefTemp = imgRef.Copy(rectTemp);
+            Image<Gray, double> imageRefTemp_gx = imgRefGradientx.Copy(rectTemp);
+            Image<Gray, double> imageRefTemp_gy = imgRefGradienty.Copy(rectTemp);
 
             // 先计算出黑森矩阵H
             Matrix<double> hession = new Matrix<double>(6, 6);
@@ -148,7 +145,6 @@ namespace sift.Lucas_Kanade
                     break;
                 }
             }
-
 
             p[0] = warp[0, 0];
             p[1] = warp[1, 0];
