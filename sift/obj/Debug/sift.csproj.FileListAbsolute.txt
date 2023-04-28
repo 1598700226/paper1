@@ -203,3 +203,16 @@ D:\csharp code\sift\sift\bin\Debug\OpenTK\shaders\shader.frag
 D:\csharp code\sift\sift\bin\Debug\OpenTK\shaders\shader.vert
 D:\csharp code\sift\sift\bin\Debug\System.ValueTuple.dll
 D:\csharp code\sift\sift\bin\Debug\System.ValueTuple.xml
+D:\csharp code\sift\sift\bin\Debug\log4net.dll
+D:\csharp code\sift\sift\bin\Debug\SuperSocket.Common.dll
+D:\csharp code\sift\sift\bin\Debug\SuperSocket.Facility.dll
+D:\csharp code\sift\sift\bin\Debug\SuperSocket.SocketBase.dll
+D:\csharp code\sift\sift\bin\Debug\log4net.xml
+D:\csharp code\sift\sift\bin\Debug\SuperSocket.Common.xml
+D:\csharp code\sift\sift\bin\Debug\SuperSocket.Facility.xml
+D:\csharp code\sift\sift\bin\Debug\SuperSocket.SocketBase.xml
+D:\csharp code\sift\sift\bin\Debug\SuperSocket.SocketEngine.dll
+D:\csharp code\sift\sift\bin\Debug\SuperSocket.SocketService.exe
+D:\csharp code\sift\sift\bin\Debug\SuperSocket.SocketEngine.xml
+D:\csharp code\sift\sift\obj\Debug\sift.SocketApp.ClientService.resources
+D:\csharp code\sift\sift\obj\Debug\sift.SocketApp.ServerService.resources

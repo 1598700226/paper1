@@ -81,7 +81,7 @@ namespace sift.PointCloudHandler
                 // 转换到新的位置
                 spcs = transformListPointClouds(spcs, tempR, tempT);
                 // 求新位置与目标点云的最近邻点， 找到对应点
-                tpcs = getNearestPointClouds(spcs, kdTree, out List<PointCloud3D> itemSpc, 10);
+                tpcs = getNearestPointClouds(spcs, kdTree, out List<PointCloud3D> itemSpc, 5);
                 spcs = itemSpc;
                 // 计算错误的变化率,变化率过低提前结束
                 double itemError = calError(spcs, tpcs);
@@ -93,6 +93,7 @@ namespace sift.PointCloudHandler
                 {
                     error = itemError;
                 }
+
                 // 计算旋转平移
                 SvdRT.RegisterPointCloud(spcs, tpcs, out tempR, out tempT);   
 

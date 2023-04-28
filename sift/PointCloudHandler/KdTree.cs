@@ -29,9 +29,15 @@ namespace sift.PointCloudHandler
         public KdTree(List<PointCloud3D> points)
         {
             // 深拷贝
-            List<PointCloud3D> copiedList = points.Select(item => new PointCloud3D(item.X, item.Y, item.Z)).ToList();
+            List<PointCloud3D> copiedList = points.Select(item => new PointCloud3D(item)).ToList();
             
             root = BuildTree(copiedList, 0);
+        }
+
+        public KdTree(List<PointCloud3D> points, String type)
+        {
+            // 浅拷贝
+            root = BuildTree(points, 0);
         }
 
         private KdNode BuildTree(List<PointCloud3D> points, int depth)

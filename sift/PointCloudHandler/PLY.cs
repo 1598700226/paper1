@@ -10,7 +10,7 @@ namespace sift.PointCloudHandler
 {
     public static class PLY
     {
-        public static void writePlyFile(String filename, List<PointCloud3D> pointCloud3Ds) {
+        public static void writePlyFile_xyzn(String filename, List<PointCloud3D> pointCloud3Ds) {
 
             int num = 0;
             foreach (PointCloud3D point in pointCloud3Ds)
@@ -46,6 +46,52 @@ namespace sift.PointCloudHandler
             }
         }
 
+        public static void writePlyFile_xyz(String filename, List<PointCloud3D> pointCloud3Ds)
+        {
+            using (StreamWriter writer = new StreamWriter(filename))
+            {
+                writer.WriteLine("ply");
+                writer.WriteLine("format ascii 1.0");
+                writer.WriteLine("element vertex " + pointCloud3Ds.Count);
+                writer.WriteLine("property float x");
+                writer.WriteLine("property float y");
+                writer.WriteLine("property float z");
+                writer.WriteLine("element face 0");
+                writer.WriteLine("property list uchar int vertex_indices");
+                writer.WriteLine("end_header");
+
+                foreach (PointCloud3D point in pointCloud3Ds)
+                {
+                    writer.WriteLine(point.X + " " + point.Y + " " + point.Z);
+                }
+            }
+        }
+
+        public static void writePlyFile_xyzrgb(String filename, List<PointCloud3D> pointCloud3Ds)
+        {
+            using (StreamWriter writer = new StreamWriter(filename))
+            {
+                writer.WriteLine("ply");
+                writer.WriteLine("format ascii 1.0");
+                writer.WriteLine("element vertex " + pointCloud3Ds.Count);
+                writer.WriteLine("property float x");
+                writer.WriteLine("property float y");
+                writer.WriteLine("property float z");
+                writer.WriteLine("property uchar red");
+                writer.WriteLine("property uchar green");
+                writer.WriteLine("property uchar blue");
+                writer.WriteLine("element face 0");
+                writer.WriteLine("property list uchar int vertex_indices");
+                writer.WriteLine("end_header");
+
+                foreach (PointCloud3D point in pointCloud3Ds)
+                {
+                    writer.WriteLine(point.X + " " + point.Y + " " + point.Z + " " + 
+                        point.color.R + " " + point.color.G + " " + point.color.B);
+                }
+            }
+        }
+
         public static void test()
         {
             List<PointCloud3D> points = new List<PointCloud3D>();
@@ -55,7 +101,22 @@ namespace sift.PointCloudHandler
             points.Add(new PointCloud3D(0, 0, 1));
             points.Add(new PointCloud3D(1, 1, 1));
 
-            writePlyFile("testPly.ply", points);
+            writePlyFile_xyzn("testPly.ply", points);
+        }
+
+        public static void writeOFFFile_xyzrgb(String filename, List<PointCloud3D> pointCloud3Ds)
+        {
+            using (StreamWriter writer = new StreamWriter(filename))
+            {
+                writer.WriteLine("off");
+                writer.WriteLine(pointCloud3Ds.Count + " 0 0");
+
+                foreach (PointCloud3D point in pointCloud3Ds)
+                {
+                    writer.WriteLine(point.X + " " + point.Y + " " + point.Z + " " +
+                        point.color.R + " " + point.color.G + " " + point.color.B);
+                }
+            }
         }
 
     }

@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -21,10 +22,11 @@ namespace sift.PointCloudHandler
 
         public double Pic_X { get; set; }
         public double Pic_Y { get; set; }
-
         public double Pic_Z { get; set; }
 
-        public int H { get; set; }
+        public Color color { get; set; }
+
+        private int H { get; set; }
 
         // 点云特征
         public bool hasNormal;
@@ -32,6 +34,10 @@ namespace sift.PointCloudHandler
         public bool hasSpfh;
         public int[] spfh;
         public double[] fpfh;
+
+        // 点云分类
+        public bool isVisited = false;
+        public int clusterId = 0;
 
         public PointCloud3D(double xw, double yw, double zw)
         {
@@ -50,6 +56,19 @@ namespace sift.PointCloudHandler
             Pic_Y = pic_y;
             Pic_Z = pic_z;
             hasSpfh = false;
+        }
+
+        public PointCloud3D(PointCloud3D pt)
+        {
+            X = pt.X;
+            Y = pt.Y;
+            Z = pt.Z;
+            Pic_X = pt.Pic_X;
+            Pic_Y = pt.Pic_Y;
+            Pic_Z = pt.Pic_Z;
+            hasSpfh = pt.hasSpfh;
+            hasNormal = pt.hasNormal;
+            n = pt.n;
         }
 
         public override string ToString()

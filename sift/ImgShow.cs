@@ -40,6 +40,10 @@ namespace sift
         private int sampleRange = 5;
         private int fpfhRange = 50;
 
+        // 选择待匹配点
+        private bool isSeletingWaitMatchPoint = false;
+        public List<PointCloud3D> waitMatchPoints = new List<PointCloud3D>();
+
         public ImgShow(Bitmap bitmap, ushort[] depths, byte[] depthsPixel, 
             CameraIntrinsics cameraIntrinsics, byte[] bgraData, byte[] oriBgraData, MainForm mainform)
         {
@@ -104,8 +108,8 @@ namespace sift
             int z_mm = depths[(pic_x + pic_y * bitmap.Width)];
             double x_mm, y_mm;
             calculateWorldXY(pic_x, pic_y, z_mm, out x_mm, out y_mm);
-            infoLabel.Text = String.Format("x_mm:{0:N} y_mm:{1:N} z_mm:{2:N}; x:{3} y:{4} z:{5}",
-                x_mm, y_mm, z_mm, pic_x, pic_y, pic_z);
+            infoLabel.Text = String.Format("x_mm:{0:N} y_mm:{1:N} z_mm:{2:N}; x:{3} y:{4} z:{5} waitMatchPointNum:{6}",
+                x_mm, y_mm, z_mm, pic_x, pic_y, pic_z, waitMatchPoints.Count);
         }
 
         private void downSamplingBtn_Click(object sender, EventArgs e)
@@ -163,6 +167,12 @@ namespace sift
                 bgraData[(pic_x + pic_y * bitmap.Width) * 4 + 2], 
                 bgraData[(pic_x + pic_y * bitmap.Width) * 4 + 1], 
                 bgraData[(pic_x + pic_y * bitmap.Width) * 4]);
+        }
+
+        public void setColorToListPoint(List<PointCloud3D> filterPointClouds) {
+            foreach (PointCloud3D point in filterPointClouds) {
+                point.color = GetColor((int)point.Pic_X, (int)point.Pic_Y);
+            }
         }
 
         private void rollBackBtn_Click(object sender, EventArgs e)
@@ -234,7 +244,8 @@ namespace sift
             Marshal.Copy(dataImg, 0, ptrSrc, dataImg.Length);
             colorDepthBitmap.UnlockBits(bitmapData);
             picBox.Image = colorDepthBitmap;
-            filterPointCloud3d = filterPointClouds;
+            bitmap = colorDepthBitmap;
+            //filterPointCloud3d = filterPointClouds;
         }
 
         private void btnRgbD_Click(object sender, EventArgs e)
@@ -282,15 +293,17 @@ namespace sift
 
         private void btnPlyFile_Click(object sender, EventArgs e)
         {
-            // 1. KD树生成, 并计算自身的法线 spfh值
+            /*// 1. KD树生成, 并计算自身的法线 spfh值
             KdTree kdTree = new KdTree(filterPointCloud3d);
-            PointFetures.getNormals(kdTree, filterPointCloud3d, 10);
-            PLY.writePlyFile("kinectPly.ply", filterPointCloud3d);
+            PointFetures.getNormals(kdTree, filterPointCloud3d, 10);*/
+            setColorToListPoint(filterPointCloud3d);
+            PLY.writePlyFile_xyzrgb("kinectPly_rgb.ply", filterPointCloud3d);
         }
 
-        private void removeGround_Click(object sender, EventArgs e)
+        private void 输出off文件ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            setColorToListPoint(filterPointCloud3d);
+            PLY.writeOFFFile_xyzrgb("kinectOff_rgb.off", filterPointCloud3d);
         }
 
         private void removeGroundBtn_Click(object sender, EventArgs e)
@@ -299,5 +312,41 @@ namespace sift
             showCloudPoint3D(filterPointCloud3d);
         }
 
+        private void selectWaitMatchPoint_Click(object sender, EventArgs e)
+        {
+            isSeletingWaitMatchPoint = true;
+            waitMatchPoints.Clear();
+        }
+
+        private void picBox_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (isSeletingWaitMatchPoint) {
+                if (e.Button == MouseButtons.Right)
+                {
+                    isSeletingWaitMatchPoint = false;
+                }
+                if (e.Button == MouseButtons.Left)
+                {
+                    int x = e.X;
+                    int y = e.Y;
+                    int pic_x = (int)((double)x / (double)picBox.Width * (double)bitmap.Width);
+                    int pic_y = (int)((double)y / (double)picBox.Height * (double)bitmap.Height);
+                    int pic_z = (int)getDepthPixelByPicXY(pic_x, pic_y);
+                    int z_mm = depths[(pic_x + pic_y * bitmap.Width)];
+                    calculateWorldXY(pic_x, pic_y, z_mm, out double x_mm, out double y_mm);
+                    waitMatchPoints.Add(new PointCloud3D(x_mm, y_mm, z_mm, pic_x, pic_y, pic_z));
+                }
+            }
+        }
+
+        private void DBSCAN_begin_btn_Click(object sender, EventArgs e)
+        {
+            double eps = double.Parse(DBSCAN_epsValue.Text);
+            double minNum = int.Parse(DBSCAN_minNum.Text);
+            List<List<PointCloud3D>> clusterPoints = ClusterPointCloud.DBSCAN(filterPointCloud3d, eps, minNum);
+
+            List<List<PointCloud3D>> cluster = clusterPoints.OrderByDescending(p => p.Count).ToList();
+            showCloudPoint3D(cluster[0]);
+        }
     }
 }

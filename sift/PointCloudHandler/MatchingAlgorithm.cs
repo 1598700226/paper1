@@ -256,16 +256,9 @@ namespace sift.PointCloudHandler
         }
 
         public static List<MatchPointResult> VariableCircleTemplateMatching(Bitmap sourceBitmap, Bitmap targetBitmap, 
-            List<MathNet.Numerics.LinearAlgebra.Matrix<double>> rotations, List<PointCloud3D> sourcePointCloud3Ds, 
-            int templateRadius, int searchRange, double limitR, List<MatchPointResult> mpr) {
-
+            MathNet.Numerics.LinearAlgebra.Vector<double> euler, List<PointCloud3D> sourcePointCloud3Ds, 
+            int templateRadius, int searchRange, double limitR) {
             List<MatchPointResult> matchPointResults = new List<MatchPointResult>();
-            MathNet.Numerics.LinearAlgebra.Matrix<double> transform = MathNet.Numerics.LinearAlgebra.Matrix<double>.Build.DenseIdentity(3, 3);
-            for (int i = 0; i < rotations.Count; i++)
-            {
-                transform = transform * rotations[i];
-            }
-            MathNet.Numerics.LinearAlgebra.Vector<double> euler = Algorithm.MatrixToEuler(transform);
 
             byte[] sourceBitmapBytes = BitmapExtensions.ConvertTo8Byte(sourceBitmap);
             byte[] targetBitmapBytes = BitmapExtensions.ConvertTo8Byte(targetBitmap);
@@ -285,7 +278,7 @@ namespace sift.PointCloudHandler
                     {
                         Point centerPoint = new Point(x + search_x, y + search_y);
                         // 采样为负
-                        double[] timg = GetEllipseData(targetBitmapBytes, picWidth, picHeight, templateRadius, centerPoint, euler[0], euler[1], -euler[2]);
+                        double[] timg = GetEllipseData(targetBitmapBytes, picWidth, picHeight, templateRadius, centerPoint, euler[1], euler[0], euler[2]);
                         double itemR = Correlation_coefficient(simg, timg);
 
                         if (itemR > R) { 

@@ -223,12 +223,12 @@ namespace sift.PointCloudHandler
             // 判断法线方向
             Vector<double> ns = svd.U.Column(2);
             Vector<double> nsc = Vector<double>.Build.Dense(3);
-            nsc[0] = pointCloud.X - centroid[0];
+/*            nsc[0] = pointCloud.X - centroid[0];
             nsc[1] = pointCloud.Y - centroid[1];
-            nsc[2] = pointCloud.Z - centroid[2];
-            /*            nsc[0] = -pointCloud.X;
-                        nsc[1] = -pointCloud.Y;
-                        nsc[2] = -pointCloud.Z;*/
+            nsc[2] = pointCloud.Z - centroid[2];*/
+            nsc[0] = -pointCloud.X;
+            nsc[1] = -pointCloud.Y;
+            nsc[2] = -pointCloud.Z;
             nsc = nsc.Normalize(1);
             double angle = Math.Round(ns.DotProduct(nsc), 6);
             if (angle < 0) {

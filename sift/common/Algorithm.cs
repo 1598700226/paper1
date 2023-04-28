@@ -292,7 +292,7 @@ namespace sift.common
             Rmatrix = Rz * Ry * Rz;
             return Rmatrix;
         }
-        // 旋转矩阵转为欧拉角
+        // 旋转矩阵转为欧拉角,弧度
         public static MathNet.Numerics.LinearAlgebra.Vector<double> MatrixToEuler(MathNet.Numerics.LinearAlgebra.Matrix<double> R)
         {
             double x,y,z;
