@@ -37,6 +37,7 @@
             this.SendMsgBtn = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.PortText = new System.Windows.Forms.TextBox();
+            this.recvFileBtn = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // IpText
@@ -58,7 +59,7 @@
             // 
             // OpenConnectBtn
             // 
-            this.OpenConnectBtn.Location = new System.Drawing.Point(557, 15);
+            this.OpenConnectBtn.Location = new System.Drawing.Point(588, 15);
             this.OpenConnectBtn.Name = "OpenConnectBtn";
             this.OpenConnectBtn.Size = new System.Drawing.Size(97, 42);
             this.OpenConnectBtn.TabIndex = 2;
@@ -119,11 +120,22 @@
             this.PortText.TabIndex = 0;
             this.PortText.Text = "8080";
             // 
+            // recvFileBtn
+            // 
+            this.recvFileBtn.Location = new System.Drawing.Point(480, 15);
+            this.recvFileBtn.Name = "recvFileBtn";
+            this.recvFileBtn.Size = new System.Drawing.Size(102, 42);
+            this.recvFileBtn.TabIndex = 5;
+            this.recvFileBtn.Text = "接收文件";
+            this.recvFileBtn.UseVisualStyleBackColor = true;
+            this.recvFileBtn.Click += new System.EventHandler(this.recvFile_Click);
+            // 
             // ClientService
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 502);
+            this.Controls.Add(this.recvFileBtn);
             this.Controls.Add(this.SendMsgBtnText);
             this.Controls.Add(this.MessageTxtBox);
             this.Controls.Add(this.SendMsgBtn);
@@ -136,6 +148,7 @@
             this.Name = "ClientService";
             this.Text = "ClientService";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.ClientService_FormClosed);
+            this.Load += new System.EventHandler(this.ClientService_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -152,5 +165,6 @@
         private System.Windows.Forms.Button SendMsgBtn;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox PortText;
+        private System.Windows.Forms.Button recvFileBtn;
     }
 }

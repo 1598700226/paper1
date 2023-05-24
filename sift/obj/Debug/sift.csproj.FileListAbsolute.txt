@@ -216,3 +216,7 @@ D:\csharp code\sift\sift\bin\Debug\SuperSocket.SocketService.exe
 D:\csharp code\sift\sift\bin\Debug\SuperSocket.SocketEngine.xml
 D:\csharp code\sift\sift\obj\Debug\sift.SocketApp.ClientService.resources
 D:\csharp code\sift\sift\obj\Debug\sift.SocketApp.ServerService.resources
+D:\csharp code\sift\sift\bin\Debug\zxing.dll
+D:\csharp code\sift\sift\bin\Debug\zxing.presentation.dll
+D:\csharp code\sift\sift\bin\Debug\zxing.xml
+D:\csharp code\sift\sift\bin\Debug\zxing.presentation.xml

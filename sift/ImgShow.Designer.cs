@@ -38,6 +38,7 @@
             this.rollBackBtn = new System.Windows.Forms.ToolStripMenuItem();
             this.rollBackOriBpmBtn = new System.Windows.Forms.ToolStripMenuItem();
             this.btnPlyFile = new System.Windows.Forms.ToolStripMenuItem();
+            this.输出off文件ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
             this.btnRgbD = new System.Windows.Forms.ToolStripMenuItem();
             this.downSamplingBtn = new System.Windows.Forms.ToolStripMenuItem();
@@ -55,7 +56,9 @@
             this.DBSCAN_minNum = new System.Windows.Forms.ToolStripTextBox();
             this.DBSCAN_begin_btn = new System.Windows.Forms.ToolStripMenuItem();
             this.calFpfh = new System.Windows.Forms.ToolStripMenuItem();
-            this.输出off文件ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.坐标转换 = new System.Windows.Forms.ToolStripDropDownButton();
+            this.selectConvertPoints = new System.Windows.Forms.ToolStripMenuItem();
+            this.convertAndOutputPly = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.picBox)).BeginInit();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -85,7 +88,8 @@
             this.toolStrip1.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.operateBtn,
-            this.toolStripDropDownButton1});
+            this.toolStripDropDownButton1,
+            this.坐标转换});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(736, 33);
@@ -143,6 +147,13 @@
             this.btnPlyFile.Size = new System.Drawing.Size(270, 34);
             this.btnPlyFile.Text = "输出ply文件";
             this.btnPlyFile.Click += new System.EventHandler(this.btnPlyFile_Click);
+            // 
+            // 输出off文件ToolStripMenuItem
+            // 
+            this.输出off文件ToolStripMenuItem.Name = "输出off文件ToolStripMenuItem";
+            this.输出off文件ToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
+            this.输出off文件ToolStripMenuItem.Text = "输出off文件";
+            this.输出off文件ToolStripMenuItem.Click += new System.EventHandler(this.输出off文件ToolStripMenuItem_Click);
             // 
             // toolStripDropDownButton1
             // 
@@ -279,12 +290,28 @@
             this.calFpfh.Text = "计算fpfh值";
             this.calFpfh.Click += new System.EventHandler(this.calFpfh_Click);
             // 
-            // 输出off文件ToolStripMenuItem
+            // 坐标转换
             // 
-            this.输出off文件ToolStripMenuItem.Name = "输出off文件ToolStripMenuItem";
-            this.输出off文件ToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
-            this.输出off文件ToolStripMenuItem.Text = "输出off文件";
-            this.输出off文件ToolStripMenuItem.Click += new System.EventHandler(this.输出off文件ToolStripMenuItem_Click);
+            this.坐标转换.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.selectConvertPoints,
+            this.convertAndOutputPly});
+            this.坐标转换.Name = "坐标转换";
+            this.坐标转换.Size = new System.Drawing.Size(100, 28);
+            this.坐标转换.Text = "坐标转换";
+            // 
+            // selectConvertPoints
+            // 
+            this.selectConvertPoints.Name = "selectConvertPoints";
+            this.selectConvertPoints.Size = new System.Drawing.Size(270, 34);
+            this.selectConvertPoints.Text = "选择待配准点";
+            this.selectConvertPoints.Click += new System.EventHandler(this.selectConvertPoints_Click);
+            // 
+            // convertAndOutputPly
+            // 
+            this.convertAndOutputPly.Name = "convertAndOutputPly";
+            this.convertAndOutputPly.Size = new System.Drawing.Size(270, 34);
+            this.convertAndOutputPly.Text = "进行转换并输出ply";
+            this.convertAndOutputPly.Click += new System.EventHandler(this.convertAndOutputPly_Click);
             // 
             // ImgShow
             // 
@@ -337,5 +364,8 @@
         private System.Windows.Forms.ToolStripTextBox DBSCAN_epsValue;
         private System.Windows.Forms.ToolStripTextBox DBSCAN_minNum;
         private System.Windows.Forms.ToolStripMenuItem 输出off文件ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripDropDownButton 坐标转换;
+        private System.Windows.Forms.ToolStripMenuItem selectConvertPoints;
+        private System.Windows.Forms.ToolStripMenuItem convertAndOutputPly;
     }
 }

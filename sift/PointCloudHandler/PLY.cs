@@ -108,16 +108,56 @@ namespace sift.PointCloudHandler
         {
             using (StreamWriter writer = new StreamWriter(filename))
             {
-                writer.WriteLine("off");
+                writer.WriteLine("OFF");
                 writer.WriteLine(pointCloud3Ds.Count + " 0 0");
 
                 foreach (PointCloud3D point in pointCloud3Ds)
                 {
-                    writer.WriteLine(point.X + " " + point.Y + " " + point.Z + " " +
+                    double x = point.X;
+                    double y = point.Y;
+                    double z = point.Z;
+                    writer.WriteLine(x + " " + y + " " + z + " " +
                         point.color.R + " " + point.color.G + " " + point.color.B);
                 }
             }
         }
 
+        public static List<PointCloud3D> readPlyFile(String filename)
+        {
+            List<PointCloud3D> pointCloud3Ds = new List<PointCloud3D>();
+            using (FileStream fs = new FileStream(filename, FileMode.Open))
+            {
+                using (StreamReader reader = new StreamReader(fs))
+                {
+                    String input = "";
+                    int pointNum = 0;
+                    while ((input = reader.ReadLine()) != null) {
+                        if (input.StartsWith("element vertex")) {
+                            String[] strs = input.Split(' ');
+                            pointNum = int.Parse(strs.Last());
+                            break;
+                        }
+                    }
+                    // Skip end_header
+                    while (!reader.ReadLine().StartsWith("end_header"))
+                    { 
+                        
+                    }
+
+                    // Read vertices
+                    for (int i = 0; i < pointNum; i++)
+                    {
+                        string[] values = reader.ReadLine().Split(' ');
+                        PointCloud3D pointCloud3D = new PointCloud3D(double.Parse(values[0]),
+                            double.Parse(values[1]),
+                            double.Parse(values[2]));
+                        pointCloud3Ds.Add(pointCloud3D);
+                    }
+
+                }
+            }
+
+            return pointCloud3Ds;
+        }
     }
 }

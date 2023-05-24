@@ -224,6 +224,21 @@ namespace sift.PFH
             return true;
         }
 
+        public static bool getSinglePointNormals(KdTree kdTree, PointCloud3D pointCloud3D, int range)
+        {
+            List<PointCloud3D> nearPoints = kdTree.RNearestNeighbors(pointCloud3D, range);
+            if (nearPoints.Count < 3)
+            {
+                pointCloud3D.hasNormal = false;
+                pointCloud3D.hasSpfh = false;
+                return false;
+            }
+
+            pointCloud3D.n = SvdRT.calNormalVector(nearPoints, pointCloud3D);
+            pointCloud3D.hasNormal = true;
+            return true;
+        }
+
 
     }
 }

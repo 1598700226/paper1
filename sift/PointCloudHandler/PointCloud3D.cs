@@ -30,7 +30,7 @@ namespace sift.PointCloudHandler
 
         // 点云特征
         public bool hasNormal;
-        public double[,] n;
+        public double[,] n; // 1行3列 x[0,0] y[0,1] z[0,2]
         public bool hasSpfh;
         public int[] spfh;
         public double[] fpfh;
@@ -68,7 +68,9 @@ namespace sift.PointCloudHandler
             Pic_Z = pt.Pic_Z;
             hasSpfh = pt.hasSpfh;
             hasNormal = pt.hasNormal;
-            n = pt.n;
+            if (hasNormal) {
+                n = new double[1, 3] { { pt.n[0, 0], pt.n[0, 1], pt.n[0, 2] } };
+            }
         }
 
         public override string ToString()

@@ -1,6 +1,7 @@
 ﻿using Emgu.CV;
 using Emgu.CV.OCR;
 using Emgu.CV.Structure;
+using MathNet.Numerics.LinearAlgebra;
 using Microsoft.Kinect;
 using sift.common;
 using sift.PFH;
@@ -44,6 +45,10 @@ namespace sift
         private bool isSeletingWaitMatchPoint = false;
         public List<PointCloud3D> waitMatchPoints = new List<PointCloud3D>();
 
+        // 选择地面的点
+        private bool isSeletingPlanePoint = false;
+        public List<PointCloud3D> planePoint = new List<PointCloud3D>(3);
+
         public ImgShow(Bitmap bitmap, ushort[] depths, byte[] depthsPixel, 
             CameraIntrinsics cameraIntrinsics, byte[] bgraData, byte[] oriBgraData, MainForm mainform)
         {
@@ -55,7 +60,6 @@ namespace sift
             this.bgraData = bgraData;
             this.oriBgraData = oriBgraData;
             this.mainForm = mainform;
-           
         }
 
         private void ImgShow_Load(object sender, EventArgs e)
@@ -96,6 +100,12 @@ namespace sift
 
             return depthsPixel[(int)ix + (int)iy * bitmap.Width];
             //return Algorithm.bilinearInterpolation(depthsPixel, bitmap.Width, bitmap.Height, x, y);
+        }
+
+        public PointCloud3D GetPointCloud3DByPicXY(double x, double y) { 
+            double zw = getDepthByPicXY(x, y);
+            calculateWorldXY(x, y, zw, out double xw, out double yw);
+            return new PointCloud3D(xw, yw, zw);
         }
 
         private void picBox_MouseMove(object sender, MouseEventArgs e)
@@ -337,6 +347,21 @@ namespace sift
                     waitMatchPoints.Add(new PointCloud3D(x_mm, y_mm, z_mm, pic_x, pic_y, pic_z));
                 }
             }
+
+            if (isSeletingPlanePoint) {
+                if (e.Button == MouseButtons.Right)
+                {
+                    isSeletingPlanePoint = false;
+                }
+                if (e.Button == MouseButtons.Left)
+                {
+                    int x = e.X;
+                    int y = e.Y;
+                    int pic_x = (int)((double)x / (double)picBox.Width * (double)bitmap.Width);
+                    int pic_y = (int)((double)y / (double)picBox.Height * (double)bitmap.Height);
+                    planePoint.Add(GetPointCloud3DByPicXY(pic_x, pic_y));
+                }
+            }
         }
 
         private void DBSCAN_begin_btn_Click(object sender, EventArgs e)
@@ -347,6 +372,46 @@ namespace sift
 
             List<List<PointCloud3D>> cluster = clusterPoints.OrderByDescending(p => p.Count).ToList();
             showCloudPoint3D(cluster[0]);
+        }
+
+        private void selectConvertPoints_Click(object sender, EventArgs e)
+        {
+            isSeletingPlanePoint = true;
+            planePoint.Clear();
+
+        }
+
+        private void convertAndOutputPly_Click(object sender, EventArgs e)
+        {
+            if (planePoint.Count != 3) {
+                return;
+            }
+/*            QRCode.getPosition((Bitmap)picBox.Image,
+                out System.Drawing.PointF leftDown,
+                out System.Drawing.PointF leftUp,
+                out System.Drawing.PointF rightUp);
+
+            List<PointCloud3D> pointCloud3Ds = new List<PointCloud3D>();
+            pointCloud3Ds.Add(GetPointCloud3DByPicXY(leftDown.X, leftDown.Y));
+            pointCloud3Ds.Add(GetPointCloud3DByPicXY(leftUp.X, leftUp.Y));
+            pointCloud3Ds.Add(GetPointCloud3DByPicXY(rightUp.X, rightUp.Y));*/
+
+            // 单位毫米
+            List<PointCloud3D> planePointCloud3Ds = new List<PointCloud3D>();
+            planePointCloud3Ds.Add(new PointCloud3D(0, 0, 0));
+            planePointCloud3Ds.Add(new PointCloud3D(0, 50, 0));
+            planePointCloud3Ds.Add(new PointCloud3D(50, 50, 0));
+
+            SvdRT.RegisterPointCloud(planePoint, planePointCloud3Ds, out MathNet.Numerics.LinearAlgebra.Matrix<double> rotation, out Vector<double> translation);
+            List<PointCloud3D> handlePC3Ds = ICP.transformListPointClouds(filterPointCloud3d, rotation, translation);
+            setColorToListPoint(filterPointCloud3d);
+            for (int i = 0; i < filterPointCloud3d.Count; i++)
+            {
+                PointCloud3D item = filterPointCloud3d[i];
+                handlePC3Ds[i].color = item.color;
+            }
+
+            PLY.writePlyFile_xyzrgb("kinectPly_rgb_convert_plane.ply", handlePC3Ds);
         }
     }
 }

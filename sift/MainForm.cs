@@ -2,16 +2,9 @@
 using Emgu.CV;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using Emgu.CV.Features2D;
-using Emgu.CV.Util;
 using sift.common;
 using sift.Lucas_Kanade;
 using sift.kinect;
@@ -22,8 +15,8 @@ using sift.PFH;
 using sift.PointCloudHandler;
 using MathNet.Numerics.LinearAlgebra;
 using sift.OpenTK;
-using System.Runtime.InteropServices.ComTypes;
 using sift.SocketApp;
+using System.Windows.Media.Imaging;
 
 namespace sift
 {
@@ -201,13 +194,28 @@ namespace sift
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            SvdRT.testRT();
+            MathNet.Numerics.LinearAlgebra.Matrix<double> r = MathNet.Numerics.LinearAlgebra.Matrix<double>.Build.DenseIdentity(3,3);
+            r[0, 0] = 0.891828;
+            r[0, 1] = -0.254036 ;
+            r[0, 2] = 0.374311;
+            r[1, 0] = 0.254124;
+            r[1, 1] = 0.965876;
+            r[1, 2] = 0.0500434;
+            r[2, 0] = -0.37425;
+            r[2, 1] = 0.0504912;
+            r[2, 2] = 0.925952;
 
-            MatchingAlgorithm.test();
-            PLY.test();
+            Vector<double> eular = Algorithm.MatrixToEuler(r);
+            double x = Algorithm.ToDegrees(eular[0]);
+            double y = Algorithm.ToDegrees(eular[1]);
+            double z = Algorithm.ToDegrees(eular[2]);
+            // SvdRT.testRT();
+            // MatchingAlgorithm.test();
+            // PLY.test();
+            // int a = 0;
+            // _3DShow ss = new _3DShow();
+            // ss.Show();
             int a = 0;
-            //_3DShow ss = new _3DShow();
-            //ss.Show();
         }
 
         private void openKinectBtn_Click(object sender, EventArgs e)
@@ -324,7 +332,7 @@ namespace sift
                         oriDataImg[i * 4 + 3] = colorPixels[(x + y * colorWidth) * 4 + 3];
 
 
-                        // 直通滤波，限制z范围点云, 单位mm
+/*                        // 直通滤波，限制z范围点云, 单位mm
                         if (udepth[i] < 500 || udepth[i] > 1500)
                         {
                             udepth[i] = 0;
@@ -333,7 +341,7 @@ namespace sift
                             dataImg[i * 4 + 2] = 255;
                             dataImg[i * 4 + 3] = 255;
                             continue;
-                        }
+                        }*/
 
 
                         // 区域选择
@@ -443,6 +451,8 @@ namespace sift
                     out MathNet.Numerics.LinearAlgebra.Matrix<double> accumulateR,
                     out MathNet.Numerics.LinearAlgebra.Vector<double> accumulateT);
                 angle.Add(Algorithm.MatrixToEuler(accumulateR));
+                Console.WriteLine("变形图:" + i + ",计算R" + accumulateR);
+                Console.WriteLine("变形图:" + i + ",计算T" + accumulateT);
             }
         }
 
@@ -519,7 +529,6 @@ namespace sift
                 //You can leave that out and it'll just update as fast as the hardware will allow it.
                 game.Run(60.0);
             }
-
         }
 
         // 计算RT 计算重投影误差 进行融合
@@ -569,7 +578,6 @@ namespace sift
                 MathNet.Numerics.LinearAlgebra.Matrix<double> r;
                 MathNet.Numerics.LinearAlgebra.Vector<double> t;
                 SvdRT.RegisterPointCloud(pointCloud3Ds2, pointCloud3Ds1, out r, out t);
-                //ICP.iteration(imgShows[i].filterPointCloud3d, imgShows[i+1].filterPointCloud3d, r, t, out MathNet.Numerics.LinearAlgebra.Matrix<double> mr, out MathNet.Numerics.LinearAlgebra.Vector<double> vt);
                 matchRs.Add(r);
                 matchTs.Add(t);
                 // 把前一张的变形图当后一张参考图
@@ -581,22 +589,9 @@ namespace sift
                 List<MathNet.Numerics.LinearAlgebra.Matrix<double>> R = matchRs.GetRange(0, i + 1);
                 List<MathNet.Numerics.LinearAlgebra.Vector<double>> T = matchTs.GetRange(0, i + 1);
                 List<PointCloud3D> pointCloud3Dsto1 = ICP.transformListPointClouds(imgShows[i + 1].filterPointCloud3d, R, T);
-
                 result3DLists.Add(pointCloud3Dsto1);
                 result3Ds.AddRange(pointCloud3Dsto1);
             }
-
-            /*// 通过可变圆模板重新匹配
-            Bitmap Img_0 = imgShows[0].getOriginBitmap();
-            List<List<MatchPointResult>> vms = new List<List<MatchPointResult>>();
-            for (int i = 0; i < imgShows.Count - 1; i++)
-            {
-                Bitmap targetImage = imgShows[i + 1].getOriginBitmap();
-                List<MathNet.Numerics.LinearAlgebra.Matrix<double>> R = matchRs.GetRange(0, i + 1);
-                List<MatchPointResult> vm = MatchingAlgorithm.VariableCircleTemplateMatching(Img_0, targetImage, R, imgShows[0].filterPointCloud3d,
-                    10, dicSearchRange, limitR, matchPointResultss[0]);
-                vms.Add(vm);
-            }*/
 
             //输出点云
             KdTree kdTree = new KdTree(result3Ds);
@@ -606,27 +601,60 @@ namespace sift
 
         private void VariableCircleMatchBegin_Click(object sender, EventArgs e)
         {
-            double angle_x = double.Parse(variableCircle_angle_x.Text);
-            double angle_y = double.Parse(variableCircle_angle_y.Text);
-            double angle_z = double.Parse(variableCircle_angle_z.Text);
-            int R = int.Parse(variableCircle_sample_r.Text);
-            int searchSize = int.Parse(variableCircle_search_size.Text);
-            int ref_index = int.Parse(variableCircle_ref_index.Text);
-            double limit_R = double.Parse(variableCircle_limit_r.Text);
-            // 判断是否会超过边界
-            ref_index = ref_index < 0 ? imgShows.Count - 1 : 
-                ref_index >= imgShows.Count - 1 ? imgShows.Count - 1 : ref_index;
+            try { 
+                double angle_x = double.Parse(variableCircle_angle_x.Text);
+                double angle_y = double.Parse(variableCircle_angle_y.Text);
+                double angle_z = double.Parse(variableCircle_angle_z.Text);
+                int R = int.Parse(variableCircle_sample_r.Text);
+                int searchSize = int.Parse(variableCircle_search_size.Text);
+                int ref_index = int.Parse(variableCircle_ref_index.Text);
+                double limit_R = double.Parse(variableCircle_limit_r.Text);
+                // 判断是否会超过边界
+                ref_index = ref_index < 0 ? imgShows.Count - 1 : 
+                    ref_index >= imgShows.Count - 1 ? imgShows.Count - 1 : ref_index;
 
-            // 通过可变圆模板重新匹配
-            Bitmap Img_0 = imgShows[0].getOriginBitmap();
-            Bitmap targetImage = imgShows[ref_index].getOriginBitmap();
-            List<MatchPointResult> vm = MatchingAlgorithm.VariableCircleTemplateMatching(Img_0, targetImage, angle[ref_index - 1], imgShows[0].waitMatchPoints,
-                    R, searchSize, limit_R);
+                // 通过可变圆模板重新匹配
+                Bitmap Img_0 = imgShows[0].getOriginBitmap();
+                Bitmap targetImage = imgShows[ref_index].getOriginBitmap();
+                List<MatchPointResult> vm = MatchingAlgorithm.VariableCircleTemplateMatching(Img_0, targetImage, angle[ref_index - 1], imgShows[0].waitMatchPoints,
+                        R, searchSize, limit_R);
 
-            List<Bitmap> bitmaps = new List<Bitmap>() { imgShows[0].bitmap, imgShows[ref_index].bitmap};
-            MatchPointShow matchPointShow = new MatchPointShow(bitmaps.ToArray(), new List<List<MatchPointResult>>() {vm});
-            matchPointShow.Show();
+                List<Bitmap> bitmaps = new List<Bitmap>() { imgShows[0].bitmap, imgShows[ref_index].bitmap};
+                MatchPointShow matchPointShow = new MatchPointShow(bitmaps.ToArray(), new List<List<MatchPointResult>>() {vm});
+                matchPointShow.Show();
 
+                // 根据匹配结果重新计算RT
+                List<PointCloud3D> pointCloud3Ds1 = new List<PointCloud3D>();
+                List<PointCloud3D> pointCloud3Ds2 = new List<PointCloud3D>();
+                for (int pi = 0; pi < vm.Count; pi++)
+                {
+                    double pic1_x = vm[pi].X;
+                    double pic1_y = vm[pi].Y;
+                    double pic1_z = imgShows[0].getDepthPixelByPicXY(pic1_x, pic1_y);
+                    double z1_mm = imgShows[0].getDepthByPicXY(pic1_x, pic1_y);
+                    double x1_mm, y1_mm;
+                    imgShows[0].calculateWorldXY(pic1_x, pic1_y, z1_mm, out x1_mm, out y1_mm);
+
+                    double pic2_x = vm[pi].match_X;
+                    double pic2_y = vm[pi].match_Y;
+                    double pic2_z = imgShows[ref_index].getDepthPixelByPicXY(pic2_x, pic2_y);
+                    double z2_mm = imgShows[ref_index].getDepthByPicXY(pic2_x, pic2_y);
+                    double x2_mm, y2_mm;
+                    imgShows[ref_index].calculateWorldXY(pic2_x, pic2_y, z2_mm, out x2_mm, out y2_mm);
+
+                    if (z1_mm == 0 || z2_mm == 0)
+                        continue;
+                    pointCloud3Ds1.Add(new PointCloud3D(x1_mm, y1_mm, z1_mm, pic1_x, pic1_y, pic1_z));
+                    pointCloud3Ds2.Add(new PointCloud3D(x2_mm, y2_mm, z2_mm, pic2_x, pic2_y, pic2_z));
+                }
+                SvdRT.RegisterPointCloud(pointCloud3Ds2, pointCloud3Ds1,
+                    out MathNet.Numerics.LinearAlgebra.Matrix<double> mr, out Vector<double> vt);
+                Console.WriteLine("[可变圆匹配]mr:" + mr);
+                Console.WriteLine("[可变圆匹配]vt:" + vt);
+            } 
+            catch (Exception ex) { 
+                Console.WriteLine(ex.Message); 
+            }
         }
 
         private void 服务端ToolStripMenuItem_Click(object sender, EventArgs e)
@@ -640,6 +668,63 @@ namespace sift
             ClientService client = new ClientService();
             client.Show();
             
+        }
+
+        List<PointCloud3D> icpTestPointClouds_1;
+        List<PointCloud3D> icpTestPointClouds_2;
+        private void 选择两幅ply点云ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog();  //ofd类
+            ofd.Title = "打开ply文件";  //窗口名
+            ofd.InitialDirectory = @"D:\"; //打开的路径
+            ofd.Multiselect = true;  //是否允许多选
+            ofd.Filter = "所有文件|*.*"; //支持的文件格式
+            ofd.ShowDialog();  //打开选择窗口
+            picturePath = ofd.FileNames;  //将选择的图片的路径存储到picturePath
+            if (picturePath.Length != 2)
+            {
+                MessageBox.Show("必须选择2副ply点云！");
+                return;
+            }
+
+            icpTestPointClouds_1 = PLY.readPlyFile(picturePath[0]);
+            icpTestPointClouds_2 = PLY.readPlyFile(picturePath[1]);
+            if (icpTestPointClouds_1.Count == 0 || icpTestPointClouds_2.Count == 0) {
+                MessageBox.Show("ply点云加载失败");
+                return;
+            }
+        }
+
+        private void ICP配准开始ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            double limitDistance = double.Parse(limitDistanceText.Text);
+
+            MathNet.Numerics.LinearAlgebra.Matrix<double> init_rotation = MathNet.Numerics.LinearAlgebra.Matrix<double>.Build.DenseIdentity(3);
+            Vector<double> init_translation = Vector<double>.Build.Dense(3);
+            ICP.iteration_point2point(icpTestPointClouds_2, icpTestPointClouds_1,
+                init_rotation, init_translation,
+                out MathNet.Numerics.LinearAlgebra.Matrix<double> rotation,
+                out Vector<double> translation, 
+                limitDistance);
+            List<PointCloud3D> pointCloud3Ds_2to1 = ICP.transformListPointClouds(icpTestPointClouds_2, rotation, translation);
+
+            PLY.writePlyFile_xyz("kinect_icp_point2point.ply", pointCloud3Ds_2to1);
+        }
+
+        private void iCP配准开始点对面ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            double limitDistance = double.Parse(limitDistanceText.Text);
+
+            MathNet.Numerics.LinearAlgebra.Matrix<double> init_rotation = MathNet.Numerics.LinearAlgebra.Matrix<double>.Build.DenseIdentity(3);
+            Vector<double> init_translation = Vector<double>.Build.Dense(3);
+            ICP.iteration_point2plane(icpTestPointClouds_2, icpTestPointClouds_1,
+                init_rotation, init_translation,
+                out MathNet.Numerics.LinearAlgebra.Matrix<double> rotation,
+                out Vector<double> translation,
+                limitDistance);
+            List<PointCloud3D> pointCloud3Ds_2to1 = ICP.transformListPointClouds(icpTestPointClouds_2, rotation, translation);
+
+            PLY.writePlyFile_xyz("kinect_icp_point2plane.ply", pointCloud3Ds_2to1);
         }
     }
 }

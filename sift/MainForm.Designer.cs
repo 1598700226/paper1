@@ -40,6 +40,12 @@
             this.sparkBtn = new System.Windows.Forms.ToolStripMenuItem();
             this.lKFAToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openTkTest = new System.Windows.Forms.ToolStripMenuItem();
+            this.iCPToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.选择两幅ply点云ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.参数设置ToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.对应点距离约束ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.limitDistanceText = new System.Windows.Forms.ToolStripTextBox();
+            this.iCP配准开始ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.kinectToolBtn = new System.Windows.Forms.ToolStripDropDownButton();
             this.openKinectBtn = new System.Windows.Forms.ToolStripMenuItem();
             this.保存ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -48,29 +54,30 @@
             this.ShowMatchResultBtn = new System.Windows.Forms.ToolStripMenuItem();
             this.calculateCloudRT = new System.Windows.Forms.ToolStripMenuItem();
             this.plyFileOutputBtn = new System.Windows.Forms.ToolStripMenuItem();
-            this.firstPicOpenBtn = new System.Windows.Forms.Button();
-            this.firstPicBox = new System.Windows.Forms.PictureBox();
-            this.secondPicBox = new System.Windows.Forms.PictureBox();
             this.可变圆匹配ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.参数设置ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.x旋转弧度ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.y旋转弧度ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.z旋转弧度ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.采样半径ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.与哪一张图比0开始ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.variableCircle_angle_x = new System.Windows.Forms.ToolStripTextBox();
+            this.y旋转弧度ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.variableCircle_angle_y = new System.Windows.Forms.ToolStripTextBox();
+            this.z旋转弧度ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.variableCircle_angle_z = new System.Windows.Forms.ToolStripTextBox();
-            this.variableCircle_sample_r = new System.Windows.Forms.ToolStripTextBox();
-            this.variableCircle_ref_index = new System.Windows.Forms.ToolStripTextBox();
-            this.VariableCircleMatchBegin = new System.Windows.Forms.ToolStripMenuItem();
             this.搜索半径ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.variableCircle_search_size = new System.Windows.Forms.ToolStripTextBox();
+            this.采样半径ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.variableCircle_sample_r = new System.Windows.Forms.ToolStripTextBox();
+            this.与哪一张图比0开始ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.variableCircle_ref_index = new System.Windows.Forms.ToolStripTextBox();
             this.相关性限制ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.variableCircle_limit_r = new System.Windows.Forms.ToolStripMenuItem();
+            this.variableCircle_limit_r = new System.Windows.Forms.ToolStripTextBox();
+            this.VariableCircleMatchBegin = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripButton1 = new System.Windows.Forms.ToolStripDropDownButton();
             this.服务端ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.客户端ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.firstPicOpenBtn = new System.Windows.Forms.Button();
+            this.firstPicBox = new System.Windows.Forms.PictureBox();
+            this.secondPicBox = new System.Windows.Forms.PictureBox();
+            this.iCP配准开始点对面ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.firstPicBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.secondPicBox)).BeginInit();
@@ -107,28 +114,28 @@
             // roiSelect
             // 
             this.roiSelect.Name = "roiSelect";
-            this.roiSelect.Size = new System.Drawing.Size(270, 34);
+            this.roiSelect.Size = new System.Drawing.Size(214, 34);
             this.roiSelect.Text = "ROI选择";
             this.roiSelect.Click += new System.EventHandler(this.roiSelect_Click);
             // 
             // closeROIbtn
             // 
             this.closeROIbtn.Name = "closeROIbtn";
-            this.closeROIbtn.Size = new System.Drawing.Size(270, 34);
+            this.closeROIbtn.Size = new System.Drawing.Size(214, 34);
             this.closeROIbtn.Text = "关闭ROI选择";
             this.closeROIbtn.Click += new System.EventHandler(this.closeROIbtn_Click);
             // 
             // saveLeftPicBtn
             // 
             this.saveLeftPicBtn.Name = "saveLeftPicBtn";
-            this.saveLeftPicBtn.Size = new System.Drawing.Size(270, 34);
+            this.saveLeftPicBtn.Size = new System.Drawing.Size(214, 34);
             this.saveLeftPicBtn.Text = "保存左图";
             this.saveLeftPicBtn.Click += new System.EventHandler(this.saveLeftPicBtn_Click);
             // 
             // saveRightPicBtn
             // 
             this.saveRightPicBtn.Name = "saveRightPicBtn";
-            this.saveRightPicBtn.Size = new System.Drawing.Size(270, 34);
+            this.saveRightPicBtn.Size = new System.Drawing.Size(214, 34);
             this.saveRightPicBtn.Text = "保存右图";
             this.saveRightPicBtn.Click += new System.EventHandler(this.saveRightPicBtn_Click);
             // 
@@ -139,7 +146,8 @@
             this.siftBtn,
             this.sparkBtn,
             this.lKFAToolStripMenuItem,
-            this.openTkTest});
+            this.openTkTest,
+            this.iCPToolStripMenuItem});
             this.alBtn.Image = ((System.Drawing.Image)(resources.GetObject("alBtn.Image")));
             this.alBtn.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.alBtn.Name = "alBtn";
@@ -149,30 +157,78 @@
             // siftBtn
             // 
             this.siftBtn.Name = "siftBtn";
-            this.siftBtn.Size = new System.Drawing.Size(218, 34);
+            this.siftBtn.Size = new System.Drawing.Size(270, 34);
             this.siftBtn.Text = "sift";
             this.siftBtn.Click += new System.EventHandler(this.siftBtn_Click);
             // 
             // sparkBtn
             // 
             this.sparkBtn.Name = "sparkBtn";
-            this.sparkBtn.Size = new System.Drawing.Size(218, 34);
+            this.sparkBtn.Size = new System.Drawing.Size(270, 34);
             this.sparkBtn.Text = "模拟散斑生成";
             this.sparkBtn.Click += new System.EventHandler(this.sparkBtn_Click);
             // 
             // lKFAToolStripMenuItem
             // 
             this.lKFAToolStripMenuItem.Name = "lKFAToolStripMenuItem";
-            this.lKFAToolStripMenuItem.Size = new System.Drawing.Size(218, 34);
+            this.lKFAToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
             this.lKFAToolStripMenuItem.Text = "LK-FA";
             this.lKFAToolStripMenuItem.Click += new System.EventHandler(this.lKFAToolStripMenuItem_Click);
             // 
             // openTkTest
             // 
             this.openTkTest.Name = "openTkTest";
-            this.openTkTest.Size = new System.Drawing.Size(218, 34);
+            this.openTkTest.Size = new System.Drawing.Size(270, 34);
             this.openTkTest.Text = "OpenTK测试";
             this.openTkTest.Click += new System.EventHandler(this.openTkTest_Click);
+            // 
+            // iCPToolStripMenuItem
+            // 
+            this.iCPToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.选择两幅ply点云ToolStripMenuItem,
+            this.参数设置ToolStripMenuItem1,
+            this.iCP配准开始ToolStripMenuItem,
+            this.iCP配准开始点对面ToolStripMenuItem});
+            this.iCPToolStripMenuItem.Name = "iCPToolStripMenuItem";
+            this.iCPToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
+            this.iCPToolStripMenuItem.Text = "ICP";
+            // 
+            // 选择两幅ply点云ToolStripMenuItem
+            // 
+            this.选择两幅ply点云ToolStripMenuItem.Name = "选择两幅ply点云ToolStripMenuItem";
+            this.选择两幅ply点云ToolStripMenuItem.Size = new System.Drawing.Size(276, 34);
+            this.选择两幅ply点云ToolStripMenuItem.Text = "选择两幅ply点云";
+            this.选择两幅ply点云ToolStripMenuItem.Click += new System.EventHandler(this.选择两幅ply点云ToolStripMenuItem_Click);
+            // 
+            // 参数设置ToolStripMenuItem1
+            // 
+            this.参数设置ToolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.对应点距离约束ToolStripMenuItem});
+            this.参数设置ToolStripMenuItem1.Name = "参数设置ToolStripMenuItem1";
+            this.参数设置ToolStripMenuItem1.Size = new System.Drawing.Size(276, 34);
+            this.参数设置ToolStripMenuItem1.Text = "参数设置";
+            // 
+            // 对应点距离约束ToolStripMenuItem
+            // 
+            this.对应点距离约束ToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.limitDistanceText});
+            this.对应点距离约束ToolStripMenuItem.Name = "对应点距离约束ToolStripMenuItem";
+            this.对应点距离约束ToolStripMenuItem.Size = new System.Drawing.Size(236, 34);
+            this.对应点距离约束ToolStripMenuItem.Text = "对应点距离约束";
+            // 
+            // limitDistanceText
+            // 
+            this.limitDistanceText.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F);
+            this.limitDistanceText.Name = "limitDistanceText";
+            this.limitDistanceText.Size = new System.Drawing.Size(270, 30);
+            this.limitDistanceText.Text = "25";
+            // 
+            // iCP配准开始ToolStripMenuItem
+            // 
+            this.iCP配准开始ToolStripMenuItem.Name = "iCP配准开始ToolStripMenuItem";
+            this.iCP配准开始ToolStripMenuItem.Size = new System.Drawing.Size(276, 34);
+            this.iCP配准开始ToolStripMenuItem.Text = "ICP配准开始(点对点)";
+            this.iCP配准开始ToolStripMenuItem.Click += new System.EventHandler(this.ICP配准开始ToolStripMenuItem_Click);
             // 
             // kinectToolBtn
             // 
@@ -214,14 +270,14 @@
             // Show3DBtn
             // 
             this.Show3DBtn.Name = "Show3DBtn";
-            this.Show3DBtn.Size = new System.Drawing.Size(270, 34);
+            this.Show3DBtn.Size = new System.Drawing.Size(219, 34);
             this.Show3DBtn.Text = "3D(暂时无用)";
             this.Show3DBtn.Click += new System.EventHandler(this.Show3DBtn_Click);
             // 
             // ShowMatchResultBtn
             // 
             this.ShowMatchResultBtn.Name = "ShowMatchResultBtn";
-            this.ShowMatchResultBtn.Size = new System.Drawing.Size(270, 34);
+            this.ShowMatchResultBtn.Size = new System.Drawing.Size(219, 34);
             this.ShowMatchResultBtn.Text = "显示匹配结果";
             this.ShowMatchResultBtn.Click += new System.EventHandler(this.ShowMatchResultBtn_Click);
             // 
@@ -238,34 +294,6 @@
             this.plyFileOutputBtn.Size = new System.Drawing.Size(270, 34);
             this.plyFileOutputBtn.Text = "输出ply文件";
             this.plyFileOutputBtn.Click += new System.EventHandler(this.plyFileOutputBtn_Click);
-            // 
-            // firstPicOpenBtn
-            // 
-            this.firstPicOpenBtn.Location = new System.Drawing.Point(12, 36);
-            this.firstPicOpenBtn.Name = "firstPicOpenBtn";
-            this.firstPicOpenBtn.Size = new System.Drawing.Size(75, 31);
-            this.firstPicOpenBtn.TabIndex = 1;
-            this.firstPicOpenBtn.Text = "open";
-            this.firstPicOpenBtn.UseVisualStyleBackColor = true;
-            this.firstPicOpenBtn.Click += new System.EventHandler(this.firstPicOpenBtn_Click);
-            // 
-            // firstPicBox
-            // 
-            this.firstPicBox.Location = new System.Drawing.Point(16, 126);
-            this.firstPicBox.Name = "firstPicBox";
-            this.firstPicBox.Size = new System.Drawing.Size(500, 400);
-            this.firstPicBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.firstPicBox.TabIndex = 3;
-            this.firstPicBox.TabStop = false;
-            // 
-            // secondPicBox
-            // 
-            this.secondPicBox.Location = new System.Drawing.Point(522, 126);
-            this.secondPicBox.Name = "secondPicBox";
-            this.secondPicBox.Size = new System.Drawing.Size(500, 400);
-            this.secondPicBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.secondPicBox.TabIndex = 4;
-            this.secondPicBox.TabStop = false;
             // 
             // 可变圆匹配ToolStripMenuItem
             // 
@@ -298,6 +326,13 @@
             this.x旋转弧度ToolStripMenuItem.Size = new System.Drawing.Size(277, 34);
             this.x旋转弧度ToolStripMenuItem.Text = "x旋转弧度";
             // 
+            // variableCircle_angle_x
+            // 
+            this.variableCircle_angle_x.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F);
+            this.variableCircle_angle_x.Name = "variableCircle_angle_x";
+            this.variableCircle_angle_x.Size = new System.Drawing.Size(270, 30);
+            this.variableCircle_angle_x.Text = "0";
+            // 
             // y旋转弧度ToolStripMenuItem
             // 
             this.y旋转弧度ToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -305,6 +340,13 @@
             this.y旋转弧度ToolStripMenuItem.Name = "y旋转弧度ToolStripMenuItem";
             this.y旋转弧度ToolStripMenuItem.Size = new System.Drawing.Size(277, 34);
             this.y旋转弧度ToolStripMenuItem.Text = "y旋转弧度";
+            // 
+            // variableCircle_angle_y
+            // 
+            this.variableCircle_angle_y.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F);
+            this.variableCircle_angle_y.Name = "variableCircle_angle_y";
+            this.variableCircle_angle_y.Size = new System.Drawing.Size(270, 30);
+            this.variableCircle_angle_y.Text = "0";
             // 
             // z旋转弧度ToolStripMenuItem
             // 
@@ -314,63 +356,12 @@
             this.z旋转弧度ToolStripMenuItem.Size = new System.Drawing.Size(277, 34);
             this.z旋转弧度ToolStripMenuItem.Text = "z旋转弧度";
             // 
-            // 采样半径ToolStripMenuItem
-            // 
-            this.采样半径ToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.variableCircle_sample_r});
-            this.采样半径ToolStripMenuItem.Name = "采样半径ToolStripMenuItem";
-            this.采样半径ToolStripMenuItem.Size = new System.Drawing.Size(277, 34);
-            this.采样半径ToolStripMenuItem.Text = "采样半径";
-            // 
-            // 与哪一张图比0开始ToolStripMenuItem
-            // 
-            this.与哪一张图比0开始ToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.variableCircle_ref_index});
-            this.与哪一张图比0开始ToolStripMenuItem.Name = "与哪一张图比0开始ToolStripMenuItem";
-            this.与哪一张图比0开始ToolStripMenuItem.Size = new System.Drawing.Size(277, 34);
-            this.与哪一张图比0开始ToolStripMenuItem.Text = "与哪一张图比(0开始)";
-            // 
-            // variableCircle_angle_x
-            // 
-            this.variableCircle_angle_x.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F);
-            this.variableCircle_angle_x.Name = "variableCircle_angle_x";
-            this.variableCircle_angle_x.Size = new System.Drawing.Size(270, 30);
-            this.variableCircle_angle_x.Text = "0";
-            // 
-            // variableCircle_angle_y
-            // 
-            this.variableCircle_angle_y.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F);
-            this.variableCircle_angle_y.Name = "variableCircle_angle_y";
-            this.variableCircle_angle_y.Size = new System.Drawing.Size(270, 30);
-            this.variableCircle_angle_y.Text = "0";
-            // 
             // variableCircle_angle_z
             // 
             this.variableCircle_angle_z.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F);
             this.variableCircle_angle_z.Name = "variableCircle_angle_z";
             this.variableCircle_angle_z.Size = new System.Drawing.Size(270, 30);
             this.variableCircle_angle_z.Text = "0";
-            // 
-            // variableCircle_sample_r
-            // 
-            this.variableCircle_sample_r.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F);
-            this.variableCircle_sample_r.Name = "variableCircle_sample_r";
-            this.variableCircle_sample_r.Size = new System.Drawing.Size(270, 30);
-            this.variableCircle_sample_r.Text = "10";
-            // 
-            // variableCircle_ref_index
-            // 
-            this.variableCircle_ref_index.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F);
-            this.variableCircle_ref_index.Name = "variableCircle_ref_index";
-            this.variableCircle_ref_index.Size = new System.Drawing.Size(270, 30);
-            this.variableCircle_ref_index.Text = "-1";
-            // 
-            // VariableCircleMatchBegin
-            // 
-            this.VariableCircleMatchBegin.Name = "VariableCircleMatchBegin";
-            this.VariableCircleMatchBegin.Size = new System.Drawing.Size(270, 34);
-            this.VariableCircleMatchBegin.Text = "开始";
-            this.VariableCircleMatchBegin.Click += new System.EventHandler(this.VariableCircleMatchBegin_Click);
             // 
             // 搜索半径ToolStripMenuItem
             // 
@@ -387,6 +378,36 @@
             this.variableCircle_search_size.Size = new System.Drawing.Size(270, 30);
             this.variableCircle_search_size.Text = "10";
             // 
+            // 采样半径ToolStripMenuItem
+            // 
+            this.采样半径ToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.variableCircle_sample_r});
+            this.采样半径ToolStripMenuItem.Name = "采样半径ToolStripMenuItem";
+            this.采样半径ToolStripMenuItem.Size = new System.Drawing.Size(277, 34);
+            this.采样半径ToolStripMenuItem.Text = "采样半径";
+            // 
+            // variableCircle_sample_r
+            // 
+            this.variableCircle_sample_r.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F);
+            this.variableCircle_sample_r.Name = "variableCircle_sample_r";
+            this.variableCircle_sample_r.Size = new System.Drawing.Size(270, 30);
+            this.variableCircle_sample_r.Text = "10";
+            // 
+            // 与哪一张图比0开始ToolStripMenuItem
+            // 
+            this.与哪一张图比0开始ToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.variableCircle_ref_index});
+            this.与哪一张图比0开始ToolStripMenuItem.Name = "与哪一张图比0开始ToolStripMenuItem";
+            this.与哪一张图比0开始ToolStripMenuItem.Size = new System.Drawing.Size(277, 34);
+            this.与哪一张图比0开始ToolStripMenuItem.Text = "与哪一张图比(0开始)";
+            // 
+            // variableCircle_ref_index
+            // 
+            this.variableCircle_ref_index.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F);
+            this.variableCircle_ref_index.Name = "variableCircle_ref_index";
+            this.variableCircle_ref_index.Size = new System.Drawing.Size(270, 30);
+            this.variableCircle_ref_index.Text = "-1";
+            // 
             // 相关性限制ToolStripMenuItem
             // 
             this.相关性限制ToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -397,9 +418,17 @@
             // 
             // variableCircle_limit_r
             // 
+            this.variableCircle_limit_r.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F);
             this.variableCircle_limit_r.Name = "variableCircle_limit_r";
-            this.variableCircle_limit_r.Size = new System.Drawing.Size(270, 34);
+            this.variableCircle_limit_r.Size = new System.Drawing.Size(270, 30);
             this.variableCircle_limit_r.Text = "0.3";
+            // 
+            // VariableCircleMatchBegin
+            // 
+            this.VariableCircleMatchBegin.Name = "VariableCircleMatchBegin";
+            this.VariableCircleMatchBegin.Size = new System.Drawing.Size(270, 34);
+            this.VariableCircleMatchBegin.Text = "开始";
+            this.VariableCircleMatchBegin.Click += new System.EventHandler(this.VariableCircleMatchBegin_Click);
             // 
             // toolStripButton1
             // 
@@ -413,16 +442,51 @@
             // 服务端ToolStripMenuItem
             // 
             this.服务端ToolStripMenuItem.Name = "服务端ToolStripMenuItem";
-            this.服务端ToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
+            this.服务端ToolStripMenuItem.Size = new System.Drawing.Size(164, 34);
             this.服务端ToolStripMenuItem.Text = "服务端";
             this.服务端ToolStripMenuItem.Click += new System.EventHandler(this.服务端ToolStripMenuItem_Click);
             // 
             // 客户端ToolStripMenuItem
             // 
             this.客户端ToolStripMenuItem.Name = "客户端ToolStripMenuItem";
-            this.客户端ToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
+            this.客户端ToolStripMenuItem.Size = new System.Drawing.Size(164, 34);
             this.客户端ToolStripMenuItem.Text = "客户端";
             this.客户端ToolStripMenuItem.Click += new System.EventHandler(this.客户端ToolStripMenuItem_Click);
+            // 
+            // firstPicOpenBtn
+            // 
+            this.firstPicOpenBtn.Location = new System.Drawing.Point(12, 36);
+            this.firstPicOpenBtn.Name = "firstPicOpenBtn";
+            this.firstPicOpenBtn.Size = new System.Drawing.Size(75, 31);
+            this.firstPicOpenBtn.TabIndex = 1;
+            this.firstPicOpenBtn.Text = "open";
+            this.firstPicOpenBtn.UseVisualStyleBackColor = true;
+            this.firstPicOpenBtn.Click += new System.EventHandler(this.firstPicOpenBtn_Click);
+            // 
+            // firstPicBox
+            // 
+            this.firstPicBox.Location = new System.Drawing.Point(16, 126);
+            this.firstPicBox.Name = "firstPicBox";
+            this.firstPicBox.Size = new System.Drawing.Size(500, 400);
+            this.firstPicBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.firstPicBox.TabIndex = 3;
+            this.firstPicBox.TabStop = false;
+            // 
+            // secondPicBox
+            // 
+            this.secondPicBox.Location = new System.Drawing.Point(522, 126);
+            this.secondPicBox.Name = "secondPicBox";
+            this.secondPicBox.Size = new System.Drawing.Size(500, 400);
+            this.secondPicBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.secondPicBox.TabIndex = 4;
+            this.secondPicBox.TabStop = false;
+            // 
+            // iCP配准开始点对面ToolStripMenuItem
+            // 
+            this.iCP配准开始点对面ToolStripMenuItem.Name = "iCP配准开始点对面ToolStripMenuItem";
+            this.iCP配准开始点对面ToolStripMenuItem.Size = new System.Drawing.Size(276, 34);
+            this.iCP配准开始点对面ToolStripMenuItem.Text = "ICP配准开始(点对面)";
+            this.iCP配准开始点对面ToolStripMenuItem.Click += new System.EventHandler(this.iCP配准开始点对面ToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -488,10 +552,17 @@
         private System.Windows.Forms.ToolStripMenuItem 搜索半径ToolStripMenuItem;
         private System.Windows.Forms.ToolStripTextBox variableCircle_search_size;
         private System.Windows.Forms.ToolStripMenuItem 相关性限制ToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem variableCircle_limit_r;
         private System.Windows.Forms.ToolStripDropDownButton toolStripButton1;
         private System.Windows.Forms.ToolStripMenuItem 服务端ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 客户端ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripTextBox variableCircle_limit_r;
+        private System.Windows.Forms.ToolStripMenuItem iCPToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 选择两幅ply点云ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem iCP配准开始ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 参数设置ToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem 对应点距离约束ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripTextBox limitDistanceText;
+        private System.Windows.Forms.ToolStripMenuItem iCP配准开始点对面ToolStripMenuItem;
     }
 }
 
