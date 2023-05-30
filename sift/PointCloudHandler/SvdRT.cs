@@ -39,6 +39,9 @@ namespace sift.PointCloudHandler
             // 旋转矩阵
             Matrix<double> rotationMatrix = svd.VT.Transpose() * svd.U.Transpose();
 
+            // 缩放
+            Matrix<double>  s = svd.W;
+
             // 平移矩阵
             Vector<double> translationVector = targetCentroid - rotationMatrix * sourceCentroid;
 
@@ -244,19 +247,19 @@ namespace sift.PointCloudHandler
             List<PointCloud3D> spointCloud3Ds = new List<PointCloud3D>();
             List<PointCloud3D> tpointCloud3Ds = new List<PointCloud3D>();
 
-            spointCloud3Ds.Add(new PointCloud3D(0, 0, 0));
-            spointCloud3Ds.Add(new PointCloud3D(1, 0, 0));
-            spointCloud3Ds.Add(new PointCloud3D(1, 1, 0));
-            spointCloud3Ds.Add(new PointCloud3D(0, 1, 0));
+            spointCloud3Ds.Add(new PointCloud3D(0, 0, 1));
+            spointCloud3Ds.Add(new PointCloud3D(1, 0, 1));
+            spointCloud3Ds.Add(new PointCloud3D(1, 1, 1));
+            spointCloud3Ds.Add(new PointCloud3D(0, 1, 1));
             /*            spointCloud3Ds.Add(new PointCloud3D(0, 0, 1));
                         spointCloud3Ds.Add(new PointCloud3D(1, 0, 1));
                         spointCloud3Ds.Add(new PointCloud3D(1, 1, 1));
                         spointCloud3Ds.Add(new PointCloud3D(0, 1, 1));*/
 
-            tpointCloud3Ds.Add(new PointCloud3D(1, 0, 0));
-            tpointCloud3Ds.Add(new PointCloud3D(2, 0, 0));
-            tpointCloud3Ds.Add(new PointCloud3D(2, 1, 0));
-            tpointCloud3Ds.Add(new PointCloud3D(1, 1, 0));
+            tpointCloud3Ds.Add(new PointCloud3D(0, 0, 1));
+            tpointCloud3Ds.Add(new PointCloud3D(0.707, -0.707, 1));
+            tpointCloud3Ds.Add(new PointCloud3D(1.414, 0, 1));
+            tpointCloud3Ds.Add(new PointCloud3D(0.707, 0.707, 1));
 /*
             tpointCloud3Ds.Add(new PointCloud3D(1, 0, 1));
             tpointCloud3Ds.Add(new PointCloud3D(1, 1, 1));

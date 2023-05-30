@@ -32,7 +32,7 @@ namespace sift
             InitializeComponent();
         }
 
-        public MatchPointShow(Bitmap[] bitmaps, List<List<MatchPointResult>> MatchPointResultss, int picBoxW = 500, int picBoxH = 400)
+        public MatchPointShow(Bitmap[] bitmaps, List<List<MatchPointResult>> MatchPointResultss, int picBoxW = 200, int picBoxH = 200)
         {
             InitializeComponent();
             this.bitmaps = bitmaps;
@@ -104,7 +104,7 @@ namespace sift
                         int ex = (int)Math.Round(item.match_X, 2);
                         int ey = (int)Math.Round(item.match_Y, 2);
                         Point endP = convertGraphicsPixBoxLoc(i + 1, ex, ey);
-                        Pen pen = new Pen(Color.FromArgb(random.Next(256), random.Next(256), random.Next(256)), 1);
+                        Pen pen = new Pen(Color.FromArgb(random.Next(256), random.Next(256), random.Next(256)), 2);
                         g.DrawLine(pen, startP, endP);
                     }
                 }

@@ -289,8 +289,28 @@ namespace sift.PointCloudHandler
                     }
                 }
 
+                // 判断是否符合相关性阈值
                 if (R >= limitR) {
-                    MatchPointResult matchPointResult = new MatchPointResult(x, y, match_x, match_y, R);
+                    Point centerPoint1 = new Point(match_x - 1, match_y);
+                    double[] timg1 = GetEllipseData(targetBitmapBytes, picWidth, picHeight, templateRadius, centerPoint1, euler[1], euler[0], euler[2]);
+                    double itemR1 = Correlation_coefficient(simg, timg1);
+                    
+                    Point centerPoint2 = new Point(match_x + 1, match_y);
+                    double[] timg2 = GetEllipseData(targetBitmapBytes, picWidth, picHeight, templateRadius, centerPoint2, euler[1], euler[0], euler[2]);
+                    double itemR2 = Correlation_coefficient(simg, timg2);
+                    
+                    Point centerPoint3 = new Point(match_x, match_y - 1);
+                    double[] timg3 = GetEllipseData(targetBitmapBytes, picWidth, picHeight, templateRadius, centerPoint3, euler[1], euler[0], euler[2]);
+                    double itemR3 = Correlation_coefficient(simg, timg3);
+                    
+                    Point centerPoint4 = new Point(match_x, match_y + 1);
+                    double[] timg4 = GetEllipseData(targetBitmapBytes, picWidth, picHeight, templateRadius, centerPoint4, euler[1], euler[0], euler[2]);
+                    double itemR4 = Correlation_coefficient(simg, timg4);
+
+                    double subx = (itemR2 - itemR1) / (2 * (2 * R - itemR2 - itemR1));
+                    double suby = (itemR4 - itemR3) / (2 * (2 * R - itemR4 - itemR3));
+
+                    MatchPointResult matchPointResult = new MatchPointResult(x, y, match_x + subx, match_y + suby, R);
                     matchPointResults.Add(matchPointResult);
                 }
             } 

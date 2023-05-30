@@ -250,7 +250,7 @@ namespace sift.PointCloudHandler
             out Matrix<double> rotation, out Vector<double> translation,
             double limitDistance = 20.0)
         {
-            int normalRange = 15;
+            int normalRange = 20;
             KdTree kdTree = new KdTree(tPointCloud3Ds);
             PointFetures.getNormals(kdTree, tPointCloud3Ds, normalRange);
             kdTree = new KdTree(tPointCloud3Ds);

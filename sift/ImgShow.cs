@@ -83,6 +83,12 @@ namespace sift
                 }
             }
             filterPointCloud3d = pointCloud3Ds;
+
+            waitMatchPoints.Add(new PointCloud3D(200, 200, 1, 200, 200, 1));
+            waitMatchPoints.Add(new PointCloud3D(300, 200, 1, 300, 200, 1));
+            waitMatchPoints.Add(new PointCloud3D(250, 250, 1, 250, 250, 1));
+            waitMatchPoints.Add(new PointCloud3D(200, 300, 1, 200, 300, 1));
+            waitMatchPoints.Add(new PointCloud3D(300, 300, 1, 300, 300, 1));
         }
 
         public double getDepthByPicXY(double x, double y) {
@@ -371,6 +377,7 @@ namespace sift
             List<List<PointCloud3D>> clusterPoints = ClusterPointCloud.DBSCAN(filterPointCloud3d, eps, minNum);
 
             List<List<PointCloud3D>> cluster = clusterPoints.OrderByDescending(p => p.Count).ToList();
+            filterPointCloud3d = cluster[0];
             showCloudPoint3D(cluster[0]);
         }
 

@@ -12,9 +12,9 @@ namespace sift.common
     {
         int width = 500;
         int height = 500;
-        int sparkNum = 10;      // 散斑数量
-        int diameter = 20;       // 散斑直径（单位：像素）
-        float density=0.75f;     // 密排度（区间：0-1，图像上的散斑密度）
+        int sparkNum = 15;      // 散斑数量
+        int diameter = 15;       // 散斑直径（单位：像素）
+        float density=0.6f;     // 密排度（区间：0-1，图像上的散斑密度）
         float variation=0.5f;   // 偏移度（区间：0-1，图像上的散斑随机排布程度，0时即为圆点整列）
         int background=1;       // 图像背景颜色（0：黑色，1：白色）
 
@@ -42,9 +42,9 @@ namespace sift.common
                 for (int yn = 0; yn < cols; yn++) {
                     int midx = xn * spacing + rd.Next(radius, spacing - radius);
                     int midy = yn * spacing + rd.Next(radius, spacing - radius);
-                    Pen pen = new Pen(Color.FromArgb(255, rd.Next(240,255), rd.Next(240, 255), rd.Next(240, 255)), 5);
+                    Pen pen = new Pen(Color.FromArgb(255, rd.Next(0,30), rd.Next(0, 30), rd.Next(0, 30)), 5);
                     Brush bush = new SolidBrush(Color.FromArgb(255, rd.Next(0, 30), rd.Next(0, 30), rd.Next(0, 30)));
-                    g.FillEllipse(bush, midx - radius, midy - radius, diameter, diameter);
+                    g.DrawEllipse(pen, midx - radius, midy - radius, diameter, diameter);
                 }
             }
             pictureBox.Image = bitmap;

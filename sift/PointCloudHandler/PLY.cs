@@ -1,6 +1,7 @@
 ﻿using AnyCAD.Foundation;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -151,6 +152,10 @@ namespace sift.PointCloudHandler
                         PointCloud3D pointCloud3D = new PointCloud3D(double.Parse(values[0]),
                             double.Parse(values[1]),
                             double.Parse(values[2]));
+                        if (values.Length > 3) {
+                            Color color = Color.FromArgb(int.Parse(values[3]), int.Parse(values[4]), int.Parse(values[5]));
+                            pointCloud3D.color = color;
+                        }
                         pointCloud3Ds.Add(pointCloud3D);
                     }
 
