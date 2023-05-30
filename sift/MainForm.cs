@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
@@ -747,8 +748,23 @@ namespace sift
         {
             double limitDistance = double.Parse(limitDistanceText.Text);
 
+            double[] init_rotation_doubles = Array.ConvertAll<string, double>(icp_init_rotation.Text.Split(' '), s => double.Parse(s));
+            double[] init_translation_doubles = Array.ConvertAll<string, double>(icp_init_translation.Text.Split(' '), s => double.Parse(s));
             MathNet.Numerics.LinearAlgebra.Matrix<double> init_rotation = MathNet.Numerics.LinearAlgebra.Matrix<double>.Build.DenseIdentity(3);
+            init_rotation[0, 0] = init_rotation_doubles[0];
+            init_rotation[0, 1] = init_rotation_doubles[1];
+            init_rotation[0, 2] = init_rotation_doubles[2];
+            init_rotation[1, 0] = init_rotation_doubles[3];
+            init_rotation[1, 1] = init_rotation_doubles[4];
+            init_rotation[1, 2] = init_rotation_doubles[5];
+            init_rotation[2, 0] = init_rotation_doubles[6];
+            init_rotation[2, 1] = init_rotation_doubles[7];
+            init_rotation[2, 2] = init_rotation_doubles[8];
             Vector<double> init_translation = Vector<double>.Build.Dense(3);
+            init_translation[0] = init_translation_doubles[0];
+            init_translation[0] = init_translation_doubles[1];
+            init_translation[0] = init_translation_doubles[2];
+
             int iterationNum = ICP.iteration_point2point(icpTestPointClouds_2, icpTestPointClouds_1,
                 init_rotation, init_translation,
                 out MathNet.Numerics.LinearAlgebra.Matrix<double> rotation,
@@ -768,8 +784,23 @@ namespace sift
         {
             double limitDistance = double.Parse(limitDistanceText.Text);
 
+            double[] init_rotation_doubles = Array.ConvertAll<string, double>(icp_init_rotation.Text.Split(' '), s => double.Parse(s));
+            double[] init_translation_doubles = Array.ConvertAll<string, double>(icp_init_translation.Text.Split(' '), s => double.Parse(s));
             MathNet.Numerics.LinearAlgebra.Matrix<double> init_rotation = MathNet.Numerics.LinearAlgebra.Matrix<double>.Build.DenseIdentity(3);
+            init_rotation[0, 0] = init_rotation_doubles[0];
+            init_rotation[0, 1] = init_rotation_doubles[1];
+            init_rotation[0, 2] = init_rotation_doubles[2];
+            init_rotation[1, 0] = init_rotation_doubles[3];
+            init_rotation[1, 1] = init_rotation_doubles[4];
+            init_rotation[1, 2] = init_rotation_doubles[5];
+            init_rotation[2, 0] = init_rotation_doubles[6];
+            init_rotation[2, 1] = init_rotation_doubles[7];
+            init_rotation[2, 2] = init_rotation_doubles[8];
             Vector<double> init_translation = Vector<double>.Build.Dense(3);
+            init_translation[0] = init_translation_doubles[0];
+            init_translation[0] = init_translation_doubles[1];
+            init_translation[0] = init_translation_doubles[2];
+
             int iterationNum = ICP.iteration_point2plane(icpTestPointClouds_2, icpTestPointClouds_1,
                 init_rotation, init_translation,
                 out MathNet.Numerics.LinearAlgebra.Matrix<double> rotation,
@@ -782,6 +813,15 @@ namespace sift
             }
 
             PLY.writePlyFile_xyzrgb("kinect_icp_point2plane.ply", pointCloud3Ds_2to1);
+        }
+
+        private void 两幅ply点云融合并降采样ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            List<PointCloud3D> fusionPointCloud3Ds = new List<PointCloud3D>();
+            fusionPointCloud3Ds.AddRange(icpTestPointClouds_1);
+            fusionPointCloud3Ds.AddRange(icpTestPointClouds_2);
+            fusionPointCloud3Ds = PointCloud3D.downSamplingTisu(5, fusionPointCloud3Ds);
+            PLY.writePlyFile_xyzrgb("kinect_icp_downsample.ply", fusionPointCloud3Ds);
         }
 
         //配准测试

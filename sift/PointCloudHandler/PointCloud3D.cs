@@ -58,6 +58,18 @@ namespace sift.PointCloudHandler
             hasSpfh = false;
         }
 
+        public PointCloud3D(double xw, double yw, double zw, double pic_x, double pic_y, double pic_z, Color pointColor)
+        {
+            X = xw;
+            Y = yw;
+            Z = zw;
+            Pic_X = pic_x;
+            Pic_Y = pic_y;
+            Pic_Z = pic_z;
+            color = pointColor;
+            hasSpfh = false;
+        }
+
         public PointCloud3D(PointCloud3D pt)
         {
             X = pt.X;
@@ -135,7 +147,8 @@ namespace sift.PointCloudHandler
                 }
                 else
                 {
-                    double x, y, z;
+                    filterPointClouds.Add(pointCloud3Ds[i]);
+/*                    double x, y, z;
                     double pic_x, pic_y, pic_z;
                     x = pointCloud3Ds[i].X;
                     y = pointCloud3Ds[i].Y;
@@ -143,8 +156,63 @@ namespace sift.PointCloudHandler
                     pic_x = pointCloud3Ds[i].Pic_X;
                     pic_y = pointCloud3Ds[i].Pic_Y;
                     pic_z = pointCloud3Ds[i].Pic_Z;
-                    filterPointClouds.Add(new PointCloud3D(x, y, z, pic_x, pic_y, pic_z));
+                    filterPointClouds.Add(new PointCloud3D(x, y, z, pic_x, pic_y, pic_z, pointCloud3Ds[i].color));*/
                 }
+            }
+
+            return filterPointClouds;
+        }
+        public static List<PointCloud3D> downSamplingTisu(int r, List<PointCloud3D> pointCloud3Ds)
+        {
+            double xmax, ymax, zmax;
+            xmax = ymax = zmax = int.MinValue;
+            double xmin, ymin, zmin;
+            xmin = ymin = zmin = int.MaxValue;
+
+            // 1.计算区域
+            foreach (PointCloud3D item in pointCloud3Ds)
+            {
+                double z_mm = item.Z;
+                double x_mm = item.X;
+                double y_mm = item.Y;
+
+                if (z_mm < 0)
+                {
+                    continue;
+                }
+                zmin = zmin < z_mm ? zmin : z_mm;
+                zmax = zmax > z_mm ? zmax : z_mm;
+                xmin = xmin < x_mm ? xmin : x_mm;
+                xmax = xmax > x_mm ? xmax : x_mm;
+                ymin = ymin < y_mm ? ymin : y_mm;
+                ymax = ymax > y_mm ? ymax : y_mm;
+            }
+
+            // 2.计算维度, 根据维度排序
+            int Dx = (int)((xmax - xmin) / r);
+            int Dy = (int)((ymax - ymin) / r);
+            int Dz = (int)((zmax - zmin) / r);
+            foreach (PointCloud3D item in pointCloud3Ds)
+            {
+                int hx = (int)((item.X - xmin) / r);
+                int hy = (int)((item.Y - ymin) / r);
+                int hz = (int)((zmax - zmin) / r);
+                item.H = hx + hy * Dx + hz * Dy * Dz;
+            }
+            pointCloud3Ds.Sort((a, b) => a.H.CompareTo(b.H));
+
+            // 3.找到相同维度，取均值实现降采样
+            List<PointCloud3D> filterPointClouds = new List<PointCloud3D>();
+            for (int i = 0, j = 0; i < pointCloud3Ds.Count - 1; i++)
+            {
+                if (pointCloud3Ds[i].H == pointCloud3Ds[i + 1].H)
+                {
+                    continue;
+                }
+                else
+                {
+                    filterPointClouds.Add(pointCloud3Ds[i]);
+                 }
             }
 
             return filterPointClouds;
