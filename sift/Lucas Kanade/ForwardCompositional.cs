@@ -40,7 +40,8 @@ namespace sift.Lucas_Kanade
             Image<Gray, byte> imageRefTemp = new Image<Gray, byte>(rectTemp.Size);
             imageRefTemp = imgRef.Copy(rectTemp);
 
-            for (int i = 0; i < 100; i++)
+            int i = 0;
+            for (i = 0; i < 50; i++)
             {
                 Image<Gray, double> warp_I = new Image<Gray, double>(tempWidth, tempHeight);
                 Image<Gray, double> warp_I_gx = new Image<Gray, double>(tempWidth, tempHeight);
@@ -70,8 +71,8 @@ namespace sift.Lucas_Kanade
                         double gy_warped = warp_I_gy.Data[y, x, 0];
                         jacobian[0, 0] = x * gx_warped;
                         jacobian[0, 1] = x * gy_warped;
-                        jacobian[0, 2] = y * gy_warped;
-                        jacobian[0, 3] = y * gx_warped;
+                        jacobian[0, 2] = y * gx_warped;
+                        jacobian[0, 3] = y * gy_warped;
                         jacobian[0, 4] = gx_warped;
                         jacobian[0, 5] = gy_warped;
 
@@ -108,6 +109,7 @@ namespace sift.Lucas_Kanade
             p[3] = warp[3, 0];
             p[4] = warp[4, 0];
             p[5] = warp[5, 0];
+            Console.WriteLine("FC迭代次数为:{0} result:{1}", i, string.Join(",", p));
             return p;
         }
 

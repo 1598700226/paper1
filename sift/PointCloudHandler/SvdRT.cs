@@ -46,10 +46,10 @@ namespace sift.PointCloudHandler
             Vector<double> translationVector = targetCentroid - rotationMatrix * sourceCentroid;
 
             // Print out results
-            Console.WriteLine("Rotation Matrix:");
+/*            Console.WriteLine("Rotation Matrix:");
             Console.WriteLine(rotationMatrix);
             Console.WriteLine("Translation Vector:");
-            Console.WriteLine(translationVector);
+            Console.WriteLine(translationVector);*/
             rotation = rotationMatrix;
             translation = translationVector;
         }

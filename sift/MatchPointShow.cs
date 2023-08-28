@@ -21,7 +21,7 @@ namespace sift
 
         public int picBoxW;
         public int picBoxH;
-        private int picColNum = 3;
+        private int picColNum = 6;
         private double scalaWidth = 1.0;
         private double scalaHeight = 1.0;
 
@@ -32,7 +32,7 @@ namespace sift
             InitializeComponent();
         }
 
-        public MatchPointShow(Bitmap[] bitmaps, List<List<MatchPointResult>> MatchPointResultss, int picBoxW = 200, int picBoxH = 200)
+        public MatchPointShow(Bitmap[] bitmaps, List<List<MatchPointResult>> MatchPointResultss, int picBoxW = 300, int picBoxH = 240)
         {
             InitializeComponent();
             this.bitmaps = bitmaps;

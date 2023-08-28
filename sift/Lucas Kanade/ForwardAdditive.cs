@@ -54,7 +54,8 @@ namespace sift.Lucas_Kanade
             Image<Gray, byte> imageRefTemp = new Image<Gray, byte>(rectTemp.Size);
             imageRefTemp = imgRef.Copy(rectTemp);
 
-            for(int i = 0; i < 50; i++) {
+            int i;
+            for (i = 0; i < 50; i++) {
                 double cost = 0;
 
                 Matrix<double> residual = new Matrix<double>(6, 1);
@@ -77,8 +78,8 @@ namespace sift.Lucas_Kanade
                         Matrix<double> jacobian = new Matrix<double>(1, 6);
                         jacobian[0, 0] = x * gx_warped;
                         jacobian[0, 1] = x * gy_warped;
-                        jacobian[0, 2] = y * gy_warped;
-                        jacobian[0, 3] = y * gx_warped;
+                        jacobian[0, 2] = y * gx_warped;
+                        jacobian[0, 3] = y * gy_warped;
                         jacobian[0, 4] = gx_warped;
                         jacobian[0, 5] = gy_warped;
 
@@ -111,6 +112,7 @@ namespace sift.Lucas_Kanade
             p[3] = warp[3, 0];
             p[4] = warp[4, 0];
             p[5] = warp[5, 0];
+            Console.WriteLine("FA迭代次数为:{0} result:{1}", i, string.Join(",", p));
             return p;
         }
     }

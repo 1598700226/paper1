@@ -116,42 +116,42 @@
             // selectWaitMatchPoint
             // 
             this.selectWaitMatchPoint.Name = "selectWaitMatchPoint";
-            this.selectWaitMatchPoint.Size = new System.Drawing.Size(270, 34);
+            this.selectWaitMatchPoint.Size = new System.Drawing.Size(218, 34);
             this.selectWaitMatchPoint.Text = "选择待匹配点";
             this.selectWaitMatchPoint.Click += new System.EventHandler(this.selectWaitMatchPoint_Click);
             // 
             // savePicBtn
             // 
             this.savePicBtn.Name = "savePicBtn";
-            this.savePicBtn.Size = new System.Drawing.Size(270, 34);
+            this.savePicBtn.Size = new System.Drawing.Size(218, 34);
             this.savePicBtn.Text = "保存图片";
             this.savePicBtn.Click += new System.EventHandler(this.savePicBtn_Click);
             // 
             // rollBackBtn
             // 
             this.rollBackBtn.Name = "rollBackBtn";
-            this.rollBackBtn.Size = new System.Drawing.Size(270, 34);
+            this.rollBackBtn.Size = new System.Drawing.Size(218, 34);
             this.rollBackBtn.Text = "还原";
             this.rollBackBtn.Click += new System.EventHandler(this.rollBackBtn_Click_1);
             // 
             // rollBackOriBpmBtn
             // 
             this.rollBackOriBpmBtn.Name = "rollBackOriBpmBtn";
-            this.rollBackOriBpmBtn.Size = new System.Drawing.Size(270, 34);
+            this.rollBackOriBpmBtn.Size = new System.Drawing.Size(218, 34);
             this.rollBackOriBpmBtn.Text = "还原原始图片";
             this.rollBackOriBpmBtn.Click += new System.EventHandler(this.rollBackBtn_Click);
             // 
             // btnPlyFile
             // 
             this.btnPlyFile.Name = "btnPlyFile";
-            this.btnPlyFile.Size = new System.Drawing.Size(270, 34);
+            this.btnPlyFile.Size = new System.Drawing.Size(218, 34);
             this.btnPlyFile.Text = "输出ply文件";
             this.btnPlyFile.Click += new System.EventHandler(this.btnPlyFile_Click);
             // 
             // 输出off文件ToolStripMenuItem
             // 
             this.输出off文件ToolStripMenuItem.Name = "输出off文件ToolStripMenuItem";
-            this.输出off文件ToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
+            this.输出off文件ToolStripMenuItem.Size = new System.Drawing.Size(218, 34);
             this.输出off文件ToolStripMenuItem.Text = "输出off文件";
             this.输出off文件ToolStripMenuItem.Click += new System.EventHandler(this.输出off文件ToolStripMenuItem_Click);
             // 
@@ -235,7 +235,7 @@
             this.GroundFilteringError.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F);
             this.GroundFilteringError.Name = "GroundFilteringError";
             this.GroundFilteringError.Size = new System.Drawing.Size(360, 30);
-            this.GroundFilteringError.Text = "40";
+            this.GroundFilteringError.Text = "5";
             // 
             // removeGroundBtn
             // 
@@ -302,14 +302,14 @@
             // selectConvertPoints
             // 
             this.selectConvertPoints.Name = "selectConvertPoints";
-            this.selectConvertPoints.Size = new System.Drawing.Size(270, 34);
+            this.selectConvertPoints.Size = new System.Drawing.Size(263, 34);
             this.selectConvertPoints.Text = "选择待配准点";
             this.selectConvertPoints.Click += new System.EventHandler(this.selectConvertPoints_Click);
             // 
             // convertAndOutputPly
             // 
             this.convertAndOutputPly.Name = "convertAndOutputPly";
-            this.convertAndOutputPly.Size = new System.Drawing.Size(270, 34);
+            this.convertAndOutputPly.Size = new System.Drawing.Size(263, 34);
             this.convertAndOutputPly.Text = "进行转换并输出ply";
             this.convertAndOutputPly.Click += new System.EventHandler(this.convertAndOutputPly_Click);
             // 

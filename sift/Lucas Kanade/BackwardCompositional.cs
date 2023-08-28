@@ -72,7 +72,8 @@ namespace sift.Lucas_Kanade
             Matrix<double> Ihession = new Matrix<double>(6, 6);
             CvInvoke.Invert(hession, Ihession, 0);
 
-            for (int i = 0; i < 50; ++i)
+            int i = 0;
+            for (i = 0; i < 50; ++i)
             {
                 Matrix<double> residual = new Matrix<double>(6, 1);
                 double cost = 0.0;
@@ -152,6 +153,7 @@ namespace sift.Lucas_Kanade
             p[3] = warp[3, 0];
             p[4] = warp[4, 0];
             p[5] = warp[5, 0];
+            Console.WriteLine("IC迭代次数为:{0} result:{1}", i, string.Join(",", p));
             return p;
         }
     }

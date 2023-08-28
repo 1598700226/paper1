@@ -83,7 +83,8 @@ namespace sift.PointCloudHandler
             Matrix<double> tempR = init_r;
             Vector<double> tempT = init_t;
 
-            while (iterations < 200)
+/*            StringBuilder sb = new StringBuilder();*/
+            while (iterations < 100)
             {
                 // 转换到新的位置
                 spcs = transformListPointClouds(spcs, tempR, tempT);
@@ -100,13 +101,14 @@ namespace sift.PointCloudHandler
                 {
                     error = itemError;
                 }
-
                 // 计算旋转平移
                 rotations.Add(tempR);
                 translations.Add(tempT);
                 SvdRT.RegisterPointCloud(spcs, tpcs, out tempR, out tempT);   
                 iterations++;
+/*                sb.Append(loss + ",");*/
             }
+/*            Console.WriteLine(sb.ToString());*/
             getRotationsAndTranslation(rotations, translations, out rotation, out translation);
             return iterations;
         }

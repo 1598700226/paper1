@@ -8,7 +8,7 @@ namespace sift.PointCloudHandler
 {
     public class ClusterPointCloud
     {
-        
+        // 半径和邻域个数
         public static List<List<PointCloud3D>> DBSCAN(List<PointCloud3D> sourcePointClouds, double eps, double minNum) {
             foreach (PointCloud3D point in sourcePointClouds) {
                 point.isVisited = false;

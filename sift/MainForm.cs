@@ -46,7 +46,7 @@ namespace sift
         {
             InitializeComponent();
         }
-
+        
         private void MainForm_Shown(object sender, EventArgs e)
         {
             graphicsPicBox = new PictureBox
@@ -188,6 +188,7 @@ namespace sift
         private void lKFAToolStripMenuItem_Click(object sender, EventArgs e)
         {
             LKMethod.invoke(picturePath[0], picturePath[1], 31, 50, 50, 0, 0, LKMethodName.ICGN);
+            LKMethod.invoke(picturePath[0], picturePath[1], 31, 50, 50, 0, 0, LKMethodName.IAGN);
             LKMethod.invoke(picturePath[0], picturePath[1], 31, 50, 50, 0, 0, LKMethodName.FAGN);
             LKMethod.invoke(picturePath[0], picturePath[1], 31, 50, 50, 0, 0, LKMethodName.FCGN);
         }
@@ -209,7 +210,7 @@ namespace sift
             double x = Algorithm.ToDegrees(eular[0]);
             double y = Algorithm.ToDegrees(eular[1]);
             double z = Algorithm.ToDegrees(eular[2]);
-             SvdRT.testRT();
+            // SvdRT.testRT();
             // MatchingAlgorithm.test();
             // PLY.test();
             // int a = 0;
@@ -389,6 +390,43 @@ namespace sift
             }
         }
 
+
+        private void dic_subsize_TextChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                subsetSize = int.Parse(dic_subsize.Text);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("DIC设置子区大小出现错误" + ex.Message);
+            }
+        }
+
+        private void dic_searchsize_TextChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                dicSearchRange = int.Parse(dic_searchsize.Text);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("DIC设置搜索大小出现错误" + ex.Message);
+            }
+        }
+
+        private void dic_limitR_TextChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                limitR = double.Parse(dic相关性阈值.Text);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("DIC设置相关性阈值出现错误" + ex.Message);
+            }
+        }
+
         List<MathNet.Numerics.LinearAlgebra.Vector<double>> angle = new List<Vector<double>>();
         private void calculateCloudRT_Click(object sender, EventArgs e)
         {
@@ -465,18 +503,29 @@ namespace sift
                 List<PointCloud3D> transformPoints = new List<PointCloud3D>();
                 for (int j = 0; j < matchPointResultss[i].Count; j++)
                 {
-                    transformPoints.Add(new PointCloud3D(matchPointResultss[i][j].match_X, matchPointResultss[i][j].match_Y, 1, matchPointResultss[i][j].match_X, matchPointResultss[i][j].match_Y, 1));
+                    double pic2_x = matchPointResultss[i][j].match_X;
+                    double pic2_y = matchPointResultss[i][j].match_Y;
+                    double pic2_z = imgShows[1].getDepthPixelByPicXY(pic2_x, pic2_y);
+                    double z2_mm = imgShows[1].getDepthByPicXY(pic2_x, pic2_y);
+                    double x2_mm, y2_mm;
+                    imgShows[i + 1].calculateWorldXY(pic2_x, pic2_y, z2_mm, out x2_mm, out y2_mm);
+                    transformPoints.Add(new PointCloud3D(x2_mm, y2_mm, z2_mm, matchPointResultss[i][j].match_X, matchPointResultss[i][j].match_Y, pic2_z));
                 }
-
                 List<PointCloud3D> pointCloud3Dsto1 = ICP.transformListPointClouds(transformPoints, R, T);
+
+                double sum = 0;
                 for (int j = 0; j < pointCloud3Dsto1.Count; j++)
                 {
-                    double x = Math.Abs(pointCloud3Dsto1[j].Pic_X - first_matchPointCloud3Ds[j].Pic_X);
-                    double y = Math.Abs(pointCloud3Dsto1[j].Pic_Y - first_matchPointCloud3Ds[j].Pic_Y);
-                    Console.WriteLine("【第{0}组】， 第{1}个点的坐标,x:{2},y:{3}, 重投影误差x:{4}, y:{5} sun:{6}",
-                        i, j, pointCloud3Dsto1[j].Pic_X, pointCloud3Dsto1[j].Pic_Y,
-                        x, y, Math.Sqrt(x * x + y * y));
+                    double x = Math.Abs(pointCloud3Dsto1[j].X - first_matchPointCloud3Ds[j].X);
+                    double y = Math.Abs(pointCloud3Dsto1[j].Y - first_matchPointCloud3Ds[j].Y);
+                    double z = Math.Abs(pointCloud3Dsto1[j].Z - first_matchPointCloud3Ds[j].Z);
+                    double avg = Math.Sqrt(x * x + y * y + z * z);
+                    Console.WriteLine("【第{0}组】， 第{1}个点的坐标,x:{2},y:{3}, z:{4}, 重投影误差x:{5}, y:{6}, z:{7} sum:{8}",
+                        i, j, pointCloud3Dsto1[j].X, pointCloud3Dsto1[j].Y, pointCloud3Dsto1[j].Z,
+                        x, y, z, avg);
+                    sum+= avg;
                 }
+                Console.WriteLine("{0}", sum / pointCloud3Dsto1.Count);
             }
 
         }
@@ -632,7 +681,7 @@ namespace sift
 
         private void VariableCircleMatchBegin_Click(object sender, EventArgs e)
         {
-            try { 
+            try {
                 double angle_x = double.Parse(variableCircle_angle_x.Text);
                 double angle_y = double.Parse(variableCircle_angle_y.Text);
                 double angle_z = double.Parse(variableCircle_angle_z.Text);
@@ -653,10 +702,10 @@ namespace sift
                     angle[0] = angle_x / 180.0 * Math.PI;
                     angle[1] = angle_y / 180.0 * Math.PI;
                     angle[2] = angle_z / 180.0 * Math.PI;
-                    vm = MatchingAlgorithm.VariableCircleTemplateMatching(Img_0, targetImage, angle, imgShows[0].waitMatchPoints, R, searchSize, limit_R);
+                    vm = MatchingAlgorithm.VariableCircleTemplateMatchingByLK(Img_0, targetImage, angle, imgShows[0].waitMatchPoints, R, searchSize, limit_R, LKMethodName.ICGN);
                 }
                 else {
-                    vm = MatchingAlgorithm.VariableCircleTemplateMatching(Img_0, targetImage, angle[ref_index - 1], imgShows[0].waitMatchPoints, R, searchSize, limit_R);
+                    vm = MatchingAlgorithm.VariableCircleTemplateMatchingByLK(Img_0, targetImage, angle[ref_index - 1], imgShows[0].waitMatchPoints, R, searchSize, limit_R, LKMethodName.ICGN);
                 }
 
                 List<Bitmap> bitmaps = new List<Bitmap>() { imgShows[0].bitmap, imgShows[ref_index].bitmap};
@@ -692,14 +741,18 @@ namespace sift
                 Console.WriteLine("[可变圆匹配]mr:" + mr);
                 Console.WriteLine("[可变圆匹配]vt:" + vt);
                 List<PointCloud3D> pointCloud3Dsto1 = ICP.transformListPointClouds(pointCloud3Ds2, mr, vt);
+                double sum = 0;
                 for (int j = 0; j < pointCloud3Dsto1.Count; j++)
                 {
-                    double x = Math.Abs(pointCloud3Dsto1[j].Pic_X - pointCloud3Ds1[j].Pic_X);
-                    double y = Math.Abs(pointCloud3Dsto1[j].Pic_Y - pointCloud3Ds1[j].Pic_Y);
-                    Console.WriteLine("【可变圆匹配】， 第{0}个点的坐标,x:{1},y:{2}, 重投影误差x:{3}, y:{4} sum:{5}",
-                        j, pointCloud3Dsto1[j].Pic_X, pointCloud3Dsto1[j].Pic_Y,
-                        x, y, Math.Sqrt(x * x + y * y));
+                    double x = Math.Abs(pointCloud3Dsto1[j].X - pointCloud3Ds1[j].X);
+                    double y = Math.Abs(pointCloud3Dsto1[j].Y - pointCloud3Ds1[j].Y);
+                    double z = Math.Abs(pointCloud3Dsto1[j].Z - pointCloud3Ds1[j].Z);
+                    sum += Math.Sqrt(x * x + y * y + z * z);
+                    Console.WriteLine("【可变圆匹配】， 第{0}个点的坐标,x:{1},y:{2}, z:{3}, 重投影误差x:{4}, y:{5}, z:{6} sum:{7}",
+                        j, pointCloud3Dsto1[j].X, pointCloud3Dsto1[j].Y, pointCloud3Dsto1[j].Z,
+                        x, y, z, Math.Sqrt(x * x + y * y + z * z));
                 }
+                Console.WriteLine("sum:{0}", sum / pointCloud3Dsto1.Count);
             }
             catch (Exception ex) {
                 Console.WriteLine(ex.Message); 
@@ -762,15 +815,15 @@ namespace sift
             init_rotation[2, 2] = init_rotation_doubles[8];
             Vector<double> init_translation = Vector<double>.Build.Dense(3);
             init_translation[0] = init_translation_doubles[0];
-            init_translation[0] = init_translation_doubles[1];
-            init_translation[0] = init_translation_doubles[2];
+            init_translation[1] = init_translation_doubles[1];
+            init_translation[2] = init_translation_doubles[2];
 
             int iterationNum = ICP.iteration_point2point(icpTestPointClouds_2, icpTestPointClouds_1,
                 init_rotation, init_translation,
                 out MathNet.Numerics.LinearAlgebra.Matrix<double> rotation,
                 out Vector<double> translation, 
                 limitDistance);
-            Console.WriteLine("ICP point2plane 迭代次数:{0}", iterationNum);
+            Console.WriteLine("ICP point2point 迭代次数:{0}", iterationNum);
             List<PointCloud3D> pointCloud3Ds_2to1 = ICP.transformListPointClouds(icpTestPointClouds_2, rotation, translation);
             for (int i = 0; i < pointCloud3Ds_2to1.Count; i++)
             {
@@ -798,8 +851,8 @@ namespace sift
             init_rotation[2, 2] = init_rotation_doubles[8];
             Vector<double> init_translation = Vector<double>.Build.Dense(3);
             init_translation[0] = init_translation_doubles[0];
-            init_translation[0] = init_translation_doubles[1];
-            init_translation[0] = init_translation_doubles[2];
+            init_translation[1] = init_translation_doubles[1];
+            init_translation[2] = init_translation_doubles[2];
 
             int iterationNum = ICP.iteration_point2plane(icpTestPointClouds_2, icpTestPointClouds_1,
                 init_rotation, init_translation,
@@ -820,7 +873,7 @@ namespace sift
             List<PointCloud3D> fusionPointCloud3Ds = new List<PointCloud3D>();
             fusionPointCloud3Ds.AddRange(icpTestPointClouds_1);
             fusionPointCloud3Ds.AddRange(icpTestPointClouds_2);
-            fusionPointCloud3Ds = PointCloud3D.downSamplingTisu(5, fusionPointCloud3Ds);
+            fusionPointCloud3Ds = PointCloud3D.downSamplingTisu(1, fusionPointCloud3Ds);
             PLY.writePlyFile_xyzrgb("kinect_icp_downsample.ply", fusionPointCloud3Ds);
         }
 
@@ -873,5 +926,6 @@ namespace sift
             }
 
         }
+
     }
 }

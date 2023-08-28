@@ -8,6 +8,7 @@ using System;
 using sift.common;
 using Emgu.CV.CvEnum;
 using System.Runtime.InteropServices;
+using sift.Lucas_Kanade;
 
 namespace sift.PointCloudHandler
 {
@@ -255,6 +256,9 @@ namespace sift.PointCloudHandler
             return listByteData.ToArray();
         }
 
+        /**
+         * 可变模板求亚像素，二次多项式拟合算法
+         */
         public static List<MatchPointResult> VariableCircleTemplateMatching(Bitmap sourceBitmap, Bitmap targetBitmap, 
             MathNet.Numerics.LinearAlgebra.Vector<double> euler, List<PointCloud3D> sourcePointCloud3Ds, 
             int templateRadius, int searchRange, double limitR) {
@@ -315,6 +319,71 @@ namespace sift.PointCloudHandler
                 }
             } 
 
+            return matchPointResults;
+        }
+
+        /**
+         * 可变模板求亚像素，LK算法
+         */
+        public static List<MatchPointResult> VariableCircleTemplateMatchingByLK(Bitmap sourceBitmap, Bitmap targetBitmap,
+            MathNet.Numerics.LinearAlgebra.Vector<double> euler, List<PointCloud3D> sourcePointCloud3Ds,
+            int templateRadius, int searchRange, double limitR, LKMethodName lKMethodName)
+        {
+            List<MatchPointResult> matchPointResults = new List<MatchPointResult>();
+
+            byte[] sourceBitmapBytes = BitmapExtensions.ConvertTo8Byte(sourceBitmap);
+            byte[] targetBitmapBytes = BitmapExtensions.ConvertTo8Byte(targetBitmap);
+            int picWidth = sourceBitmap.Width;
+            int picHeight = sourceBitmap.Height;
+            for (int i = 0; i < sourcePointCloud3Ds.Count; i++)
+            {
+                int x = (int)sourcePointCloud3Ds[i].Pic_X;
+                int y = (int)sourcePointCloud3Ds[i].Pic_Y;
+                double R = double.MinValue;
+                int match_x = 0;
+                int match_y = 0;
+
+                Point scenterPoint = new Point(x, y);
+                double[] simg = GetEllipseData(sourceBitmapBytes, picWidth, picHeight, templateRadius, scenterPoint, 0, 0, 0);
+                for (int search_x = -searchRange / 2; search_x < searchRange / 2; search_x++)
+                {
+                    for (int search_y = -searchRange / 2; search_y < searchRange / 2; search_y++)
+                    {
+                        Point centerPoint = new Point(x + search_x, y + search_y);
+                        // 采样为负
+                        double[] timg = GetEllipseData(targetBitmapBytes, picWidth, picHeight, templateRadius, centerPoint, euler[1], euler[0], euler[2]);
+                        double itemR = Correlation_coefficient(simg, timg);
+
+                        if (itemR > R)
+                        {
+                            R = itemR;
+                            match_x = centerPoint.X;
+                            match_y = centerPoint.Y;
+                        }
+                    }
+                }
+
+                // 判断是否符合相关性阈值
+                if (R >= limitR)
+                {
+                    Image<Gray, byte> imageRef = BitmapExtensions.ToGrayImage(sourceBitmap);
+                    Image<Gray, byte> imageDef = BitmapExtensions.ToGrayImage(targetBitmap);
+                    int tempSize = 2 * templateRadius + 1;  // todo 暂时设为和可变模板相同的大小
+                    int tx = x;
+                    int ty = y;
+                    double ux = Math.Cos(euler[1]) - 1;
+                    double uy = -Math.Sin(euler[2]);
+                    double vx = Math.Sin(euler[2]);
+                    double vy = Math.Cos(euler[0]) - 1;
+                    double[] p0 = new double[] { 0, 0, 0, 0, match_x, match_y};
+                    p0 = null;
+                    double[] result = LKMethod.invoke(imageRef, imageDef, tempSize, tx, ty, lKMethodName, p0);
+                    double subx = result[4];
+                    double suby = result[5];
+                    MatchPointResult matchPointResult = new MatchPointResult(x, y, subx, suby, R);
+                    matchPointResults.Add(matchPointResult);
+                }
+            }
             return matchPointResults;
         }
 

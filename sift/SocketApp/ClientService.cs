@@ -98,7 +98,6 @@ namespace sift.SocketApp
                     string str = Encoding.UTF8.GetString(buffer, 0, effective);
                     updateMessageBox("来自服务器 --- " + str);
                 }
- 
             }
         }
 
