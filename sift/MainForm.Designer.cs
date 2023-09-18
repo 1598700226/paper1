@@ -65,6 +65,8 @@
             this.dic_limitR = new System.Windows.Forms.ToolStripTextBox();
             this.Show3DBtn = new System.Windows.Forms.ToolStripMenuItem();
             this.ShowMatchResultBtn = new System.Windows.Forms.ToolStripMenuItem();
+            this.outPutPointCloudByOff = new System.Windows.Forms.ToolStripMenuItem();
+            this.btnOutPutPointCloudToOffFile = new System.Windows.Forms.ToolStripMenuItem();
             this.calculateCloudRT = new System.Windows.Forms.ToolStripMenuItem();
             this.plyFileOutputBtn = new System.Windows.Forms.ToolStripMenuItem();
             this.可变圆匹配ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -94,6 +96,7 @@
             this.firstPicOpenBtn = new System.Windows.Forms.Button();
             this.firstPicBox = new System.Windows.Forms.PictureBox();
             this.secondPicBox = new System.Windows.Forms.PictureBox();
+            this.点云计算RT手动选点ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.firstPicBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.secondPicBox)).BeginInit();
@@ -111,7 +114,7 @@
             this.toolStripButton3});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(1034, 38);
+            this.toolStrip1.Size = new System.Drawing.Size(1034, 33);
             this.toolStrip1.TabIndex = 0;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -126,7 +129,7 @@
             this.operateBtn.Image = ((System.Drawing.Image)(resources.GetObject("operateBtn.Image")));
             this.operateBtn.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.operateBtn.Name = "operateBtn";
-            this.operateBtn.Size = new System.Drawing.Size(64, 33);
+            this.operateBtn.Size = new System.Drawing.Size(64, 28);
             this.operateBtn.Text = "操作";
             // 
             // roiSelect
@@ -302,6 +305,7 @@
             this.保存ToolStripMenuItem,
             this.FusionBtn,
             this.calculateCloudRT,
+            this.点云计算RT手动选点ToolStripMenuItem,
             this.plyFileOutputBtn,
             this.可变圆匹配ToolStripMenuItem});
             this.kinectToolBtn.Name = "kinectToolBtn";
@@ -311,14 +315,14 @@
             // openKinectBtn
             // 
             this.openKinectBtn.Name = "openKinectBtn";
-            this.openKinectBtn.Size = new System.Drawing.Size(270, 34);
+            this.openKinectBtn.Size = new System.Drawing.Size(288, 34);
             this.openKinectBtn.Text = "打开";
             this.openKinectBtn.Click += new System.EventHandler(this.openKinectBtn_Click);
             // 
             // 保存ToolStripMenuItem
             // 
             this.保存ToolStripMenuItem.Name = "保存ToolStripMenuItem";
-            this.保存ToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
+            this.保存ToolStripMenuItem.Size = new System.Drawing.Size(288, 34);
             this.保存ToolStripMenuItem.Text = "保存";
             this.保存ToolStripMenuItem.Click += new System.EventHandler(this.保存ToolStripMenuItem_Click);
             // 
@@ -327,9 +331,10 @@
             this.FusionBtn.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.dIC设置ToolStripMenuItem,
             this.Show3DBtn,
-            this.ShowMatchResultBtn});
+            this.ShowMatchResultBtn,
+            this.outPutPointCloudByOff});
             this.FusionBtn.Name = "FusionBtn";
-            this.FusionBtn.Size = new System.Drawing.Size(270, 34);
+            this.FusionBtn.Size = new System.Drawing.Size(288, 34);
             this.FusionBtn.Text = "融合";
             this.FusionBtn.Click += new System.EventHandler(this.FusionBtn_Click);
             // 
@@ -340,7 +345,7 @@
             this.dic搜索区域,
             this.dic相关性阈值});
             this.dIC设置ToolStripMenuItem.Name = "dIC设置ToolStripMenuItem";
-            this.dIC设置ToolStripMenuItem.Size = new System.Drawing.Size(219, 34);
+            this.dIC设置ToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
             this.dIC设置ToolStripMenuItem.Text = "DIC设置";
             // 
             // 子区大小ToolStripMenuItem
@@ -394,28 +399,43 @@
             // Show3DBtn
             // 
             this.Show3DBtn.Name = "Show3DBtn";
-            this.Show3DBtn.Size = new System.Drawing.Size(219, 34);
+            this.Show3DBtn.Size = new System.Drawing.Size(270, 34);
             this.Show3DBtn.Text = "3D(暂时无用)";
             this.Show3DBtn.Click += new System.EventHandler(this.Show3DBtn_Click);
             // 
             // ShowMatchResultBtn
             // 
             this.ShowMatchResultBtn.Name = "ShowMatchResultBtn";
-            this.ShowMatchResultBtn.Size = new System.Drawing.Size(219, 34);
+            this.ShowMatchResultBtn.Size = new System.Drawing.Size(270, 34);
             this.ShowMatchResultBtn.Text = "显示匹配结果";
             this.ShowMatchResultBtn.Click += new System.EventHandler(this.ShowMatchResultBtn_Click);
+            // 
+            // outPutPointCloudByOff
+            // 
+            this.outPutPointCloudByOff.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.btnOutPutPointCloudToOffFile});
+            this.outPutPointCloudByOff.Name = "outPutPointCloudByOff";
+            this.outPutPointCloudByOff.Size = new System.Drawing.Size(270, 34);
+            this.outPutPointCloudByOff.Text = "输出点云off文件";
+            // 
+            // btnOutPutPointCloudToOffFile
+            // 
+            this.btnOutPutPointCloudToOffFile.Name = "btnOutPutPointCloudToOffFile";
+            this.btnOutPutPointCloudToOffFile.Size = new System.Drawing.Size(146, 34);
+            this.btnOutPutPointCloudToOffFile.Text = "开始";
+            this.btnOutPutPointCloudToOffFile.Click += new System.EventHandler(this.btnOutPutPointCloudToOffFile_Click);
             // 
             // calculateCloudRT
             // 
             this.calculateCloudRT.Name = "calculateCloudRT";
-            this.calculateCloudRT.Size = new System.Drawing.Size(270, 34);
+            this.calculateCloudRT.Size = new System.Drawing.Size(288, 34);
             this.calculateCloudRT.Text = "点云计算RT";
             this.calculateCloudRT.Click += new System.EventHandler(this.calculateCloudRT_Click);
             // 
             // plyFileOutputBtn
             // 
             this.plyFileOutputBtn.Name = "plyFileOutputBtn";
-            this.plyFileOutputBtn.Size = new System.Drawing.Size(270, 34);
+            this.plyFileOutputBtn.Size = new System.Drawing.Size(288, 34);
             this.plyFileOutputBtn.Text = "输出ply文件";
             this.plyFileOutputBtn.Click += new System.EventHandler(this.plyFileOutputBtn_Click);
             // 
@@ -425,7 +445,7 @@
             this.参数设置ToolStripMenuItem,
             this.VariableCircleMatchBegin});
             this.可变圆匹配ToolStripMenuItem.Name = "可变圆匹配ToolStripMenuItem";
-            this.可变圆匹配ToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
+            this.可变圆匹配ToolStripMenuItem.Size = new System.Drawing.Size(288, 34);
             this.可变圆匹配ToolStripMenuItem.Text = "可变圆匹配";
             // 
             // 参数设置ToolStripMenuItem
@@ -574,14 +594,14 @@
             // 服务端ToolStripMenuItem
             // 
             this.服务端ToolStripMenuItem.Name = "服务端ToolStripMenuItem";
-            this.服务端ToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
+            this.服务端ToolStripMenuItem.Size = new System.Drawing.Size(164, 34);
             this.服务端ToolStripMenuItem.Text = "服务端";
             this.服务端ToolStripMenuItem.Click += new System.EventHandler(this.服务端ToolStripMenuItem_Click);
             // 
             // 客户端ToolStripMenuItem
             // 
             this.客户端ToolStripMenuItem.Name = "客户端ToolStripMenuItem";
-            this.客户端ToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
+            this.客户端ToolStripMenuItem.Size = new System.Drawing.Size(164, 34);
             this.客户端ToolStripMenuItem.Text = "客户端";
             this.客户端ToolStripMenuItem.Click += new System.EventHandler(this.客户端ToolStripMenuItem_Click);
             // 
@@ -632,6 +652,13 @@
             this.secondPicBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.secondPicBox.TabIndex = 4;
             this.secondPicBox.TabStop = false;
+            // 
+            // 点云计算RT手动选点ToolStripMenuItem
+            // 
+            this.点云计算RT手动选点ToolStripMenuItem.Name = "点云计算RT手动选点ToolStripMenuItem";
+            this.点云计算RT手动选点ToolStripMenuItem.Size = new System.Drawing.Size(288, 34);
+            this.点云计算RT手动选点ToolStripMenuItem.Text = "点云计算RT(手动选点)";
+            this.点云计算RT手动选点ToolStripMenuItem.Click += new System.EventHandler(this.点云计算RT手动选点ToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -724,6 +751,9 @@
         private System.Windows.Forms.ToolStripTextBox dic_searchsize;
         private System.Windows.Forms.ToolStripMenuItem dic相关性阈值;
         private System.Windows.Forms.ToolStripTextBox dic_limitR;
+        private System.Windows.Forms.ToolStripMenuItem outPutPointCloudByOff;
+        private System.Windows.Forms.ToolStripMenuItem btnOutPutPointCloudToOffFile;
+        private System.Windows.Forms.ToolStripMenuItem 点云计算RT手动选点ToolStripMenuItem;
     }
 }
 

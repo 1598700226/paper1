@@ -145,6 +145,29 @@ namespace sift.PointCloudHandler
             return transPointCloud3Ds;
         }
 
+        // 不包含图像点的点云位置变换
+        public static List<PointCloud3D> transformListPointCloudsNotPicPositon(List<PointCloud3D> sourcePoints, Matrix<double> rotation, Vector<double> translation)
+        {
+            List<PointCloud3D> transPointCloud3Ds = new List<PointCloud3D>();
+            for (int i = 0; i < sourcePoints.Count; i++)
+            {
+                Matrix<double> point = Matrix<double>.Build.Dense(1, 3);
+                Matrix<double> pointW = Matrix<double>.Build.Dense(1, 3);
+                pointW[0, 0] = sourcePoints[i].X;
+                pointW[0, 1] = sourcePoints[i].Y;
+                pointW[0, 2] = sourcePoints[i].Z;
+                point[0, 0] = sourcePoints[i].Pic_X;
+                point[0, 1] = sourcePoints[i].Pic_Y;
+                point[0, 2] = sourcePoints[i].Pic_Z;
+
+                Matrix<double> newLoctionW = rotation * pointW.Row(0).ToColumnMatrix() + translation.ToColumnMatrix();
+
+                transPointCloud3Ds.Add(new PointCloud3D(newLoctionW[0, 0], newLoctionW[1, 0], newLoctionW[2, 0],
+                    point[0, 0], point[0, 1], point[0, 2]));
+            }
+            return transPointCloud3Ds;
+        }
+
         // 注意顺序，矩阵运算不满足交换律
         public static List<PointCloud3D> transformListPointClouds(List<PointCloud3D> sourcePoints, List<Matrix<double>> rotations, List<Vector<double>> translations)
         {

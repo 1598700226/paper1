@@ -308,12 +308,29 @@ namespace sift.PointCloudHandler
         }
 
         // 根据Z的深度直通滤波
-        public static List<PointCloud3D> DirectFiltingByWorldZmm(List<PointCloud3D> pointCloud3Ds, int max, int min) { 
+        public static List<PointCloud3D> DirectFiltingByWorldZmm(List<PointCloud3D> pointCloud3Ds, double max, double min, String type = "z") { 
             List<PointCloud3D> filterPointClouds = new List<PointCloud3D>();
             foreach (PointCloud3D item in pointCloud3Ds)
             {
-                if (item.Z > min && item.Z < max) { 
-                    filterPointClouds.Add(item);
+                if (type.ToLower().Equals("x"))
+                {
+                    if (item.X > min && item.X < max)
+                    {
+                        filterPointClouds.Add(item);
+                    }
+                }
+                else if (type.ToLower().Equals("y"))
+                {
+                    if (item.Y > min && item.Y < max)
+                    {
+                        filterPointClouds.Add(item);
+                    }
+                }
+                else {
+                    if (item.Z > min && item.Z < max)
+                    {
+                        filterPointClouds.Add(item);
+                    }
                 }
             }
             return filterPointClouds;

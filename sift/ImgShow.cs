@@ -1,6 +1,10 @@
-﻿using Emgu.CV;
+﻿using AnyCAD.Foundation;
+using Emgu.CV;
+using Emgu.CV.CvEnum;
+using Emgu.CV.Features2D;
 using Emgu.CV.OCR;
 using Emgu.CV.Structure;
+using Emgu.CV.Util;
 using MathNet.Numerics.LinearAlgebra;
 using Microsoft.Kinect;
 using sift.common;
@@ -17,6 +21,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Media.Animation;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace sift
@@ -238,7 +243,19 @@ namespace sift
 
         private void DirectFilteringBtn_Click(object sender, EventArgs e)
         {
-            filterPointCloud3d = PointCloud3D.DirectFiltingByWorldZmm(filterPointCloud3d, 1500, 0);
+            filterPointCloud3d = PointCloud3D.DirectFiltingByWorldZmm(filterPointCloud3d, Convert.ToDouble(passFilterMax.Text), Convert.ToDouble(passFilterMin.Text), "z");
+            showCloudPoint3D(filterPointCloud3d);
+        }
+
+        private void DirectFilteringXBtn_Click(object sender, EventArgs e)
+        {
+            filterPointCloud3d = PointCloud3D.DirectFiltingByWorldZmm(filterPointCloud3d, Convert.ToDouble(passFilterMax.Text), Convert.ToDouble(passFilterMin.Text), "x");
+            showCloudPoint3D(filterPointCloud3d);
+        }
+
+        private void DirectFilteringYBtn_Click(object sender, EventArgs e)
+        {
+            filterPointCloud3d = PointCloud3D.DirectFiltingByWorldZmm(filterPointCloud3d, Convert.ToDouble(passFilterMax.Text), Convert.ToDouble(passFilterMin.Text), "y");
             showCloudPoint3D(filterPointCloud3d);
         }
 
@@ -386,7 +403,23 @@ namespace sift
         {
             isSeletingPlanePoint = true;
             planePoint.Clear();
+        }
 
+        private void 获取位姿变换矩阵ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            List<PointCloud3D> planePointCloud3Ds = new List<PointCloud3D>();
+            string[] pt1 = calibrationPoint_1.Text.Trim().Split(' ');
+            string[] pt2 = calibrationPoint_2.Text.Trim().Split(' ');
+            string[] pt3 = calibrationPoint_3.Text.Trim().Split(' ');
+            planePointCloud3Ds.Add(new PointCloud3D(Convert.ToDouble(pt1[0]), Convert.ToDouble(pt1[1]), Convert.ToDouble(pt1[2])));
+            planePointCloud3Ds.Add(new PointCloud3D(Convert.ToDouble(pt2[0]), Convert.ToDouble(pt2[1]), Convert.ToDouble(pt2[2])));
+            planePointCloud3Ds.Add(new PointCloud3D(Convert.ToDouble(pt3[0]), Convert.ToDouble(pt3[1]), Convert.ToDouble(pt3[2])));
+            SvdRT.RegisterPointCloud(planePoint, planePointCloud3Ds, out MathNet.Numerics.LinearAlgebra.Matrix<double> rotation, 
+                out Vector<double> translation);
+            mainForm.pt_rotation = rotation;
+            mainForm.pt_translation = translation;
+            Console.WriteLine("获取位姿变换矩阵 R:" + rotation);
+            Console.WriteLine("获取位姿变换矩阵 T:" + translation);
         }
 
         private void convertAndOutputPly_Click(object sender, EventArgs e)
@@ -404,22 +437,46 @@ namespace sift
             pointCloud3Ds.Add(GetPointCloud3DByPicXY(leftUp.X, leftUp.Y));
             pointCloud3Ds.Add(GetPointCloud3DByPicXY(rightUp.X, rightUp.Y));*/
 
-            // 单位毫米
+            // 单位米
             List<PointCloud3D> planePointCloud3Ds = new List<PointCloud3D>();
             planePointCloud3Ds.Add(new PointCloud3D(0, 0, 0));
-            planePointCloud3Ds.Add(new PointCloud3D(0, 50, 0));
-            planePointCloud3Ds.Add(new PointCloud3D(50, 50, 0));
+            planePointCloud3Ds.Add(new PointCloud3D(0, 0, 0.15));
+            planePointCloud3Ds.Add(new PointCloud3D(0.15, 0, 0.15));
 
             SvdRT.RegisterPointCloud(planePoint, planePointCloud3Ds, out MathNet.Numerics.LinearAlgebra.Matrix<double> rotation, out Vector<double> translation);
-            List<PointCloud3D> handlePC3Ds = ICP.transformListPointClouds(filterPointCloud3d, rotation, translation);
+            List<PointCloud3D> handlePC3Ds = ICP.transformListPointCloudsNotPicPositon(filterPointCloud3d, rotation, translation);
             setColorToListPoint(filterPointCloud3d);
             for (int i = 0; i < filterPointCloud3d.Count; i++)
             {
                 PointCloud3D item = filterPointCloud3d[i];
                 handlePC3Ds[i].color = item.color;
+                handlePC3Ds[i].X = handlePC3Ds[i].X / 1000.0;
+                handlePC3Ds[i].Y = handlePC3Ds[i].Y / 1000.0;
+                handlePC3Ds[i].Z = handlePC3Ds[i].Z / 1000.0;
             }
+            filterPointCloud3d = handlePC3Ds;
 
-            PLY.writePlyFile_xyzrgb("kinectPly_rgb_convert_plane.ply", handlePC3Ds);
+            PLY.writePlyFile_xyzrgb("kinectPly_rgb_convert_plane.ply", filterPointCloud3d);
+        }
+
+        private void sift特征点选择ToolStripMenuItem_Click(object sender, EventArgs e)
+        { 
+            SIFT sift = new SIFT();
+
+            // 检测关键点
+            VectorOfKeyPoint keyPoints = new VectorOfKeyPoint();
+            Mat descriptors = new Mat();
+
+            Image<Bgr, byte> emguImage = BitmapExtensions.ToBgrImage(bitmap);
+            sift.DetectAndCompute(emguImage, null, keyPoints, descriptors, false);
+
+            // 在图像上绘制关键点
+            Mat keyPointImage = new Mat();
+            Features2DToolbox.DrawKeypoints(emguImage, keyPoints, keyPointImage, new Bgr(Color.Red), Features2DToolbox.KeypointDrawType.Default);
+
+            // 显示图像，包含关键点
+            CvInvoke.Imshow("SIFT Keypoints", keyPointImage);
+            CvInvoke.WaitKey(0);
         }
     }
 }
